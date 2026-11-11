@@ -46,4 +46,3 @@ def draw_maze(grid, use_north=True):
         out.append(line)
 
     print("\n".join(out))
-    print("DONE")

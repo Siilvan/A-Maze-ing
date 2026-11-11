@@ -18,6 +18,8 @@ class MazeConfig:
                  width: int = 50,
                  height: int = 50,
                  ) -> None:
+        self.width: int = width
+        self.height: int = height
         self.entry_pos: tuple[int, int] = entry_pos
         if (exit_pos is None):
             self.exit_pos: tuple[int, int] = (self.width - 1,
@@ -26,8 +28,6 @@ class MazeConfig:
             self.exit_pos = exit_pos
         self.output_path: str = output_path
         self.perfect: bool = perfect
-        self.width: int = width
-        self.height: int = height
 
     def validate_config(self) -> bool:
         """
@@ -49,7 +49,7 @@ class MazeConfig:
         config: "MazeConfig" = cls()
         with open(path, "r") as f:
             line_n : int = 1
-            line: str = f.readline()
+            line: str = f.readline().strip()
             while (line != ""):
                 tokens = line.split("=")
                 if (len(tokens) != 2):
@@ -59,7 +59,7 @@ class MazeConfig:
                             line=line)
                 if (not config._assign_key(tokens[0], tokens[1])):
                     raise MazeConfig.ParseError(
-                            msg=f"Failed to assign {tokens[1]} to {tokens[1]}, " +
+                            msg=f"Failed to assign {tokens[1]} to {tokens[0]}, " +
                             "ensure the type and naming are correct.",
                             line_n=line_n,
                             line=line
@@ -81,6 +81,7 @@ class MazeConfig:
             if (parsed is None):
                 return False
             setattr(self, key, parsed)
+            return True
         if (key == "entry"):
             return self._assign_key("entry_pos", val)
         if (key == "exit"):

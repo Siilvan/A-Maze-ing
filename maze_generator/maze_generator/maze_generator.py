@@ -1,11 +1,22 @@
-from .config import MazeConfig
 import random
+from .config import MazeConfig
+from abc import ABC, abstractmethod
 
 
-class MazeGenerator():
-    def __init__(self):
-        self.width = 10
-        self.height = 10
+
+class MazeGenerator(ABC):
+    """
+    Base class for other maze generators.
+
+    It defines the abstract "generate_maze" class every generator should have.
+
+    Contains some functions that should work for an type of maze generator:
+        - make_non_perfect
+        - draw_logo
+    """
+    def __init__(self, conf: MazeConfig):
+        self.width = conf.width
+        self.height = conf.height
         self.grid: list[list[int]] = [
             [15 for i in range(self.width)]
             for j in range(self.height)]
@@ -13,11 +24,24 @@ class MazeGenerator():
         self.new_sets: list[int] = []
         self.next_id = 1
 
-    def generate_maze(self):
+    @abstractmethod
+    def generate_maze(self) -> None:
+        pass
+
+
+class RowByRowMazeGenerator(MazeGenerator):
+    """
+    A type of "MazeGenerator".
+
+    This MazeGenerator is inspired by Ellers algorithm.
+    It works with sets and creates the maze row by row.
+    This generator is mainly useful for huge mazes
+    """
+    def generate_maze(self) -> None:
         for y in range(self.height):
             self.sets = self.new_sets
             self.new_sets = []
-            merge_chance: float = (random.uniform(0.4, 0.6)
+            merge_chance: float = (random.uniform(0.49, 0.55)
                                    if y != self.height - 1 else 1)
             if y != 0:
                 self.initialise_sets(self.grid[y - 1])
