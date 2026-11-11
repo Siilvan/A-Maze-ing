@@ -21,6 +21,7 @@ def load_conf(conf_path: str) -> MazeConfig | None:
     return None
 
 
+
 def main() -> None:
     conf: MazeConfig | None = load_conf("maze.conf")
     if (conf is None):
@@ -28,7 +29,7 @@ def main() -> None:
         return
     generator = RowByRowMazeGenerator(conf)
     generator.generate_maze()
-    draw_maze(generator.grid)
+    draw_maze(generator.get_maze())
 
 
 if __name__ == "__main__":
