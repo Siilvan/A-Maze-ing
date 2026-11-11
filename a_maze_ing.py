@@ -27,8 +27,8 @@ def main() -> None:
         Logger.get().e("Failed to load configuration.")
         return
     generator = RowByRowMazeGenerator(conf)
-    generator.generate_maze()
-    draw_maze(generator.grid)
+    grid: list[list[int]] = generator.generate_maze()
+    draw_maze(grid)
 
 
 if __name__ == "__main__":

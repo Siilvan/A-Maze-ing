@@ -1,4 +1,5 @@
 import random
+from typing import override
 from .config import MazeConfig
 from abc import ABC, abstractmethod
 
@@ -25,7 +26,7 @@ class MazeGenerator(ABC):
         self.next_id = 1
 
     @abstractmethod
-    def generate_maze(self) -> None:
+    def generate_maze(self) -> list[list[int]]:
         pass
 
 
@@ -37,7 +38,9 @@ class RowByRowMazeGenerator(MazeGenerator):
     It works with sets and creates the maze row by row.
     This generator is mainly useful for huge mazes
     """
-    def generate_maze(self) -> None:
+
+    @override
+    def generate_maze(self) -> list[list[int]]:
         for y in range(self.height):
             self.sets = self.new_sets
             self.new_sets = []
@@ -51,6 +54,7 @@ class RowByRowMazeGenerator(MazeGenerator):
                 self.h_corridors(self.grid[y], merge_chance)
             if y != self.height - 1:
                 self.v_corridors(self.grid[y])
+        return self.grid
 
     def initialise_sets(self, row_above: list[int] = []):
         for x in range(self.width):
