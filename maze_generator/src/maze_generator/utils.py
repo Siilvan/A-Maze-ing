@@ -36,7 +36,7 @@ def try_parse[T](val: Any, to_type: type[T]) -> Any:
     if (to_type is int):
         try:
             return int(val)
-        except TypeError:
+        except ValueError:
             return None
     if (to_type is bool):
         return parse_bool(val)
