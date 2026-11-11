@@ -41,8 +41,7 @@ class RowByRowMazeGenerator(MazeGenerator):
         for y in range(self.height):
             self.sets = self.new_sets
             self.new_sets = []
-            merge_chance: float = (random.uniform(0.49, 0.55)
-                                   if y != self.height - 1 else 1)
+            merge_chance: float = (0.5 if y != self.height - 1 else 1)
             if y != 0:
                 self.initialise_sets(self.grid[y - 1])
                 self.h_corridors(self.grid[y], merge_chance, self.grid[y - 1])
@@ -73,19 +72,30 @@ class RowByRowMazeGenerator(MazeGenerator):
             else:
                 set_dict[self.new_sets[x]] = [x]
         for cell_list in set_dict.values():
-            cell = random.choice(cell_list)
-            row[cell] &= ~4
+            random.shuffle(cell_list)
+            count = random.randint(1, len(cell_list))
+            for cell in cell_list[:count]:
+                row[cell] &= ~4
+        # for cell_list in set_dict.values():
+        #     cell = random.choice(cell_list)
+        #     row[cell] &= ~4
 
     def h_corridors(
             self, row: list[int],
             merge_chance: float, row_above: list[int] = []
             ) -> None:
+        last: bool = merge_chance == 1
+        print(last)
         for x in range(self.width - 1):
             if (self.new_sets[x] != self.new_sets[x + 1] and
                random.random() < merge_chance):
                 row[x] &= ~2
                 row[x + 1] &= ~8
                 self.merge_sets(self.new_sets[x], self.new_sets[x + 1])
+                if not last:
+                    merge_chance -= random.uniform(0.05, 0.15)
+            else:
+                merge_chance += random.uniform(0.1, 0.15)
 
         for x in range(self.width):
             if row_above and (row_above[x] & 4) == 0:
