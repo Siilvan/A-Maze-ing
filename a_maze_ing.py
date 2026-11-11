@@ -1,4 +1,4 @@
-from maze_generator.maze_generator import *
+from maze_generator import MazeConfig, RowByRowMazeGenerator
 from stupid_claude_draw_test_func import draw_maze
 
 def main() -> None:
