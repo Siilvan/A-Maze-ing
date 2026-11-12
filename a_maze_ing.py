@@ -2,8 +2,7 @@ from pathlib import Path
 
 from maze_generator import MazeConfig, RowByRowMazeGenerator
 from logger import Logger
-from stupid_claude_draw_test_func import draw_maze
-from window import MlxWindow
+from rendering.window import MlxWindow
 
 def load_conf(conf_path: str) -> MazeConfig | None:
     """
@@ -18,9 +17,8 @@ def load_conf(conf_path: str) -> MazeConfig | None:
     try:
         return MazeConfig.from_file(conf_path)
     except MazeConfig.ParseError as e:
-        Logger.get().e(f"Parse error on line ({e.line_n}): {e.msg}\n{e.line} << HERE")
+        Logger.get().e(f"Parse error on line ({e.line_n}): {e.msg}\n{e.line[:-1]} << HERE")
     return None
-
 
 
 def main() -> None:
@@ -29,10 +27,15 @@ def main() -> None:
         Logger.get().e("Failed to load configuration.")
         return
     generator = RowByRowMazeGenerator(conf)
-    grid: list[list[int]] = generator.generate_maze()
+    generator.generate_maze()
+    grid : list[list[int]] = generator.get_maze()
+    # grid = [[1, 2, 4, 8]]
     window: MlxWindow = MlxWindow()
     window.draw_maze(grid)
     window.loop()
+    # logger1 = Logger().get()
+    # logger2 = Logger().get()
+    # print(f"1: {logger1}, 2: {logger2}")
 
 if __name__ == "__main__":
     main()

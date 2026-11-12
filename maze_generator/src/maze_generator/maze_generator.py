@@ -143,7 +143,7 @@ class RowByRowMazeGenerator(MazeGenerator):
         self.new_sets: list[int] = []
         self.next_id = 1
 
-    def initial_grid(self) -> list[list[int]]:
+    def initial_grid(self) -> None:
         for y in range(self.height):
             self.sets = self.new_sets
             self.new_sets = []
