@@ -22,6 +22,7 @@ def load_conf(conf_path: str) -> MazeConfig | None:
     return None
 
 
+
 def main() -> None:
     conf: MazeConfig | None = load_conf("maze.conf")
     if (conf is None):
@@ -32,7 +33,6 @@ def main() -> None:
     window: MlxWindow = MlxWindow()
     window.draw_maze(grid)
     window.loop()
-
 
 if __name__ == "__main__":
     main()
