@@ -1,0 +1,3 @@
+-e git+ssh://git@vogsphere-v2.codam.nl/vogsphere/intra-uuid-6c5c21ee-3141-48bb-adfe-8e0b9b1c005e-7791867-sgroenve@0506bead6f0a3dafbef018fff091f5fc205412ef#egg=maze_generator&subdirectory=maze_generator
+mlx @ file:///home/ngero/Documents/amazeing/libs/mlx/ubuntu/mlx-2.2-py3-none-any.whl#sha256=7a1a44b50b6295f574522ba1a1e589632c6299d193dec57c951e8fdfb3337195
+pillow==13.0.0
