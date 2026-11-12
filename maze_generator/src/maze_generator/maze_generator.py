@@ -23,7 +23,7 @@ class MazeGenerator(ABC):
             [15 for _ in range(self.width)]
             for _ in range(self.height)]
         self.perfect = conf.perfect
-        self.blocked: list[list[bool]] = Logos("G", conf).MakeLogo()
+        self.blocked: list[list[bool]] = Logos("42", conf).MakeLogo()
 
     def get_maze(self) -> list[list[int]]:
         return self.grid

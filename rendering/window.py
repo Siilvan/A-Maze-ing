@@ -11,26 +11,36 @@ from logger import Logger
 logger = Logger.get()
 IMG_DIR = Path(__file__).resolve().parent / "./images/"
 CELL_SIZE = 16
-CELL_SCALE = 2
+CELL_SCALE = 5
 N, E, S, W = 1, 2, 4, 8
 
 class MlxWindow:
     """
     A window wrapper for the Mlx Library
     """
-    def __init__(self, background_color: Color = Colors.WHITE, name: str = "A-Maze-Ing!") -> None:
+    def __init__(self) -> None:
         self.mlx = Mlx()
-        self.cell_size: tuple[int, int] = (round(CELL_SIZE * CELL_SCALE),
-                                           round(CELL_SIZE * CELL_SCALE))
         if (self.mlx is None):
             return logger.e("Failed to get the connection to the x server")
-        self.width: int = 1920
-        self.height: int = 1080
         self.mptr: int = self.mlx.mlx_init()
         self.image_cache: dict[int, MlxImage] = {}
-        self.wptr: int = self.mlx.mlx_new_window(self.mptr, self.width, self.height, name)
-        self.setup(background_color)
         logger.i("Successfully initialized window")
+
+    def init_window(self,
+                    size: tuple[int, int],
+                    bg: Color = Colors.WHITE,
+                    name: str = "Window",
+                    cell_size: int = CELL_SIZE,
+                    cell_scale: int = CELL_SCALE) -> None:
+        """
+        Initializes the Mlx window
+        """
+        self.cell_size: tuple[int, int] = (round(cell_size * cell_scale),
+                                           round(cell_size * cell_scale))
+        self.width: int = size[0]
+        self.height: int = size[1]
+        self.wptr: int = self.mlx.mlx_new_window(self.mptr, self.width, self.height, name)
+        self.setup(bg)
 
     def setup(self, bg: Color) -> None:
         """
@@ -85,6 +95,8 @@ class MlxWindow:
         """
         if (cell == 0):
             return str(IMG_DIR / "empty.png")
+        if (cell == N + E + S + W):
+            return str(IMG_DIR / f"full_{random.randint(1, 6)}.png")
         path: list[str] = []
         if (cell & N):
             path.append("north")
