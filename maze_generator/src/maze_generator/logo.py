@@ -1,5 +1,5 @@
-from .config import MazeConfig
-from . import errors
+from . import MazeConfig
+from logger import Logger
 from collections import deque
 
 CHARS: dict[str, list[str]] = {
@@ -81,7 +81,7 @@ class Logos():
 
         logo_width = len(logo_grid[0])
         if self.width < logo_width + 2 or self.height < 7:
-            raise errors.MazeSizeException(
+            raise Exception(
                 f"Maze too small: must be at least {logo_width + 2}"
                 f" wide and 7 high.")
         start_r = (self.height - glyph_rows) // 2

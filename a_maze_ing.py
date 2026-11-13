@@ -3,6 +3,7 @@ from pathlib import Path
 from maze_generator import MazeConfig, RowByRowMazeGenerator
 from logger import Logger
 from rendering.window import CELL_SCALE, CELL_SIZE, MlxWindow
+import stupid_claude_draw_test_func as e
 
 def load_conf(conf_path: str) -> MazeConfig | None:
     """
@@ -29,15 +30,16 @@ def main() -> None:
     generator = RowByRowMazeGenerator(conf)
     generator.generate_maze()
     grid : list[list[int]] = generator.get_maze()
-    # grid = [[1, 2, 4, 8]]
-    window: MlxWindow = MlxWindow()
-    window.init_window((CELL_SIZE * CELL_SCALE * conf.width, CELL_SIZE * CELL_SCALE * conf.height),
-                       )
-    window.draw_maze(grid)
-    window.loop()
+    # window: MlxWindow = MlxWindow()
+    # window.init_window((CELL_SIZE * CELL_SCALE * conf.width, CELL_SIZE * CELL_SCALE * conf.height),
+    #                    )
+    # window.draw_maze(grid)
+    # window.loop()
+
     # logger1 = Logger().get()
     # logger2 = Logger().get()
     # print(f"1: {logger1}, 2: {logger2}")
+    e.draw_maze(generator.grid)
 
 if __name__ == "__main__":
     main()
