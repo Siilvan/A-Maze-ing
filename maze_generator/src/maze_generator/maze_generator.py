@@ -12,7 +12,6 @@ class MazeGenerator(ABC):
 
     Contains some functions that every maze generator needs:
         - remove_dead_ends
-        - draw_logo
         - generate_maze
     """
     def __init__(self, conf: MazeConfig):
@@ -31,6 +30,9 @@ class MazeGenerator(ABC):
         """
         Wrapper function for creating the full maze
         """
+        self.grid = [
+            [15 for _ in range(self.width)]
+            for _ in range(self.height)]
         self.initial_grid()
         if not self.perfect:
             self.remove_dead_ends()

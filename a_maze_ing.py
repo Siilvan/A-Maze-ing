@@ -30,6 +30,9 @@ def main() -> None:
     generator = RowByRowMazeGenerator(conf)
     generator.generate_maze()
     draw_maze(generator.get_maze())
+    input("apple or juice?")
+    generator.generate_maze()
+    draw_maze(generator.get_maze())
 
 
 if __name__ == "__main__":
