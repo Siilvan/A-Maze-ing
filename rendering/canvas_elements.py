@@ -1,9 +1,11 @@
 from pathlib import Path
+import uuid
 
-from PIL import Image, ImageFont
+from PIL import Image, ImageFont, ImageDraw
 from typing import Callable, override
 
 from logger import Logger
+from rendering.colors import Color, Colors
 from rendering.image import MlxImage
 
 from .canvas import CanvasElement
@@ -24,36 +26,33 @@ class CanvasText(CanvasElement):
     _char_table: dict[str, MlxImage] = {}
     FONT_DIR: Path = Path(__file__).resolve().parent / "./static/fonts/"
 
-    def __init__(self, text: str, character_spacing: int = 12) -> None:
+    def __init__(self, text: str, font_size: int = 12, color: Color = Colors.BLACK) -> None:
         self.text = text
-        self.character_spacing = character_spacing
+        self.font_size = font_size
+        self.color = color
         super().__init__()
 
     @override
     def _draw(self) -> None:
-        for i, c in enumerate(self.text):
-            image: MlxImage | None = self.get_char_image(c)
-            if (image is None):
-                continue
-            self.window.put_image(image,
-                                  self.position[0] + (i * self.character_spacing),
-                                  self.position[1])
+        image: MlxImage | None = self.get_string_image(self.text)
+        if (image is None):
+            logger.e(f"Failed to generate image for string '{self.text}'")
+            return
+        self.window.put_image(image, self.position[0], self.position[1])
         return super()._draw()
 
-    def get_char_image(self, char: str, point_size: int = 12) -> MlxImage | None:
-        if (len(char) != 1):
-            return logger.e("CanvasText: Passed parameter is not a char!")
-        if (char in CanvasText._char_table):
-            return CanvasText._char_table[char]
-        logger.i(f"No character image for char '{char}', generating and caching it.")
+    def get_string_image(self, string: str) -> MlxImage | None:
         font: ImageFont.FreeTypeFont = ImageFont.truetype(CanvasText.FONT_DIR /
-                                                          "Roboto-Regular.ttf", point_size)
-        im = Image.Image()._new(font.getmask(char, start=(10, 10)))
-        im_path: str = f"/tmp/PILtemp_{ord(char)}.png" 
+                                                          "Roboto-Regular.ttf", self.font_size)
+        ascent, descent = font.getmetrics()
+        height: int = ascent + descent
+        advance: float = font.getlength(string)
+        width: int = max(1, round(advance))
+        im = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(im)
+        draw.text((0, ascent - font.getbbox(string)[3]), string,
+                      font=font, fill=self.color.to_tuple())
+        im_path: str = f"/tmp/PILtemp_{uuid.uuid1()}.png" 
         im.save(im_path)
-        mlx_image: MlxImage | None = MlxImage.from_image(self.window.mlx, self.window.mptr, im_path)
-        if (mlx_image is not None):
-            CanvasText._char_table[char] = mlx_image
-            logger.i(f"Successfully generated and cached image for char '{char}'")
-            return mlx_image
-        logger.e(f"Failed to generate image for char '{char}'")
+        return MlxImage.from_image(self.window.mlx, self.window.mptr, im_path)
+

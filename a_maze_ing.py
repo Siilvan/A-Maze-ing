@@ -4,6 +4,7 @@ from maze_generator import MazeConfig, RowByRowMazeGenerator
 from logger import Logger
 from rendering.canvas import Canvas
 from rendering.canvas_elements import CanvasText
+from rendering.colors import Colors
 from rendering.window import MlxWindow
 
 def load_conf(conf_path: str) -> MazeConfig | None:
@@ -32,8 +33,10 @@ def main() -> None:
     # generator.generate_maze()
     # grid : list[list[int]] = generator.get_maze()
     window: MlxWindow = MlxWindow()
+    window.init_window((1920, 1080))
     canvas: Canvas = Canvas(window)  # pyright: ignore[reportArgumentType]
-    label: CanvasText = CanvasText("Hello World")
+    label: CanvasText = CanvasText("Hello World", 32, Colors.BROWN)
+    label.position = (50, 50)
     canvas.add_child(label)
     canvas.render_canvas()
     window.loop()

@@ -17,6 +17,9 @@ class Color:
                 a=random.randint(0, 255),
                 )
 
+    def to_tuple(self) -> tuple[int, int, int, int]:
+        return (self.r, self.g, self.b, self.a)
+
     def to_int(self) -> int:
         return (self.a << 24) | (self.r << 16) | (self.g << 8) | self.b
 
