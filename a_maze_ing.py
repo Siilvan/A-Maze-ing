@@ -5,6 +5,7 @@ from logger import Logger
 from rendering.canvas import Canvas
 from rendering.canvas_elements import CanvasText
 from rendering.colors import Colors
+from rendering.maze_window import MazeWindow
 from rendering.window import MlxWindow
 
 def load_conf(conf_path: str) -> MazeConfig | None:
@@ -25,21 +26,22 @@ def load_conf(conf_path: str) -> MazeConfig | None:
 
 
 def main() -> None:
-    # conf: MazeConfig | None = load_conf("maze.conf")
-    # if (conf is None):
-    #     Logger.get().e("Failed to load configuration.")
-    #     return
-    # generator = RowByRowMazeGenerator(conf)
-    # generator.generate_maze()
-    # grid : list[list[int]] = generator.get_maze()
-    window: MlxWindow = MlxWindow()
-    window.init_window((1920, 1080))
-    canvas: Canvas = Canvas(window)  # pyright: ignore[reportArgumentType]
-    label: CanvasText = CanvasText("Hello World", 32, Colors.BROWN)
-    label.position = (50, 50)
-    canvas.add_child(label)
-    canvas.render_canvas()
-    window.loop()
+    conf: MazeConfig | None = load_conf("maze.conf")
+    if (conf is None):
+        Logger.get().e("Failed to load configuration.")
+        return
+    generator = RowByRowMazeGenerator(conf)
+    generator.generate_maze()
+    grid : list[list[int]] = generator.get_maze()
+    window: MazeWindow = MazeWindow()
+    # window: MlxWindow = MlxWindow()
+    # window.init_window((1920, 1080), Colors.DARK_GRAY)
+    # canvas: Canvas = Canvas(window)
+    # label: CanvasText = CanvasText("Hello World", 60, Colors.FOREST_GREEN)
+    # label.global_position = (100, 0)
+    # canvas.add_child(label)
+    # canvas.render_canvas()
+    # window.loop()
 
 if __name__ == "__main__":
     main()

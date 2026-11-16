@@ -14,10 +14,11 @@ IMG_DIR = Path(__file__).resolve().parent / "./static/images/"
 N, E, S, W = 1, 2, 4, 8
 
 class MazeWindow:
-    def __init__(self, cell_size: int = CELL_SIZE, cell_scale: int = CELL_SCALE) -> None:
+    def __init__(self, grid: list[list[int]], cell_size: int = CELL_SIZE, cell_scale: int = CELL_SCALE) -> None:
         self.window: MlxWindow = MlxWindow()
         self.cell_size: tuple[int, int] = (round(cell_size * cell_scale),
                                            round(cell_size * cell_scale))
+        self.window.init_window((1920, 1080))
         self.image_cache: dict[int, MlxImage] = {}
         pass
 

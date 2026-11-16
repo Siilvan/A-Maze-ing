@@ -8,10 +8,10 @@ from rendering.image import MlxImage
 from rendering.window import MlxWindow
 
 class Rect:
-    def __init__(self, size: tuple[int, int], start: tuple[int, int], end: tuple[int, int]) -> None:
+    def __init__(self, size: tuple[int, int], start: tuple[int, int]) -> None:
         self.size = size
         self.start = start
-        self.end = end
+        self.end = (self.start[0] + self.size[0], self.start[1] + self.size[1])
         pass
 
     @classmethod
@@ -19,7 +19,7 @@ class Rect:
         """
         Returns a new empty rect
         """
-        return Rect((0, 0), (0, 0), (0, 0))
+        return Rect((0, 0), (0, 0))
 
     def has_point(self, point: tuple[int, int]) -> bool:
         """
@@ -33,7 +33,11 @@ class CanvasElement(ABC):
 
     def __init__(self) -> None:
         self._initialized: bool = False
-        self.position: tuple[int, int] = (0, 0)
+        self.parent: CanvasElement | None = None
+        # Position on screen
+        self.global_position: tuple[int, int] = (0, 0)
+        # Positions based on parent's position
+        self.position: tuple[int, int] = self.global_position
         self.rect: Rect = Rect.empty()
         self.children: list[CanvasElement] = []
         super().__init__()
@@ -53,6 +57,7 @@ class CanvasElement(ABC):
         if (not self._initialized):
             return Logger.get().e("Cannot add child to uninitialized element.")
         self.children.append(child)
+        child.parent = self
         child.initialize(self.window)
 
     def remove_child(self, child: "CanvasElement"):
@@ -60,6 +65,7 @@ class CanvasElement(ABC):
         Removes a child to this canvas element
         """
         self.children.remove(child)
+        child.parent = None
 
     def draw(self) -> None:
         """

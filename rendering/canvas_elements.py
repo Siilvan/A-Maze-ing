@@ -8,7 +8,7 @@ from logger import Logger
 from rendering.colors import Color, Colors
 from rendering.image import MlxImage
 
-from .canvas import CanvasElement
+from .canvas import CanvasElement, Rect
 
 logger = Logger.get()
 
@@ -38,7 +38,8 @@ class CanvasText(CanvasElement):
         if (image is None):
             logger.e(f"Failed to generate image for string '{self.text}'")
             return
-        self.window.put_image(image, self.position[0], self.position[1])
+        self.rect = Rect((image.width, image.height), self.global_position)
+        self.window.put_image(image, self.global_position[0], self.global_position[1])
         return super()._draw()
 
     def get_string_image(self, string: str) -> MlxImage | None:
