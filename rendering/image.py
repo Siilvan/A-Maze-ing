@@ -1,12 +1,15 @@
+from pathlib import Path
+
 from mlx import Mlx
 from PIL import Image
 
+from logger import Logger
 from rendering.colors import Color, Colors
 
 
 class MlxImage:
     """
-    Class to store the data of an image from the mlx_get_data_addr call
+    Class to store an Mlx image
     """
     def __init__(self, pixels: memoryview,
                  bppixels: int,
@@ -44,32 +47,28 @@ class MlxImage:
                 )
 
     @classmethod
-    def from_image(cls, mlx: Mlx, mlxprt: int, image_path: str, scale: float = 1) -> "MlxImage":
+    def from_image(cls, mlx: Mlx, mlxprt: int, image_path: str, scale: float = 1) -> "MlxImage | None":
         """
         Creates a new MlxImage instance from an existing image
         """
-        pimg = Image.open(image_path).convert("RGBA")
-        if scale != 1:
-            width = round(pimg.width * scale)
-            height = round(pimg.height * scale)
-            pimg = pimg.resize((width, height), Image.Resampling.NEAREST)
-        width, height = pimg.size
-        image = MlxImage.new_image(mlx, mlxprt, width, height)
-        src = pimg.tobytes()
-        for y in range(height):
-            src_start = y * width * 4
-            dst_start = y * image.sizeline
-            row = bytearray(src[src_start:src_start + width * 4])
-            for x in range(width):
-                i = x * 4
-                if image.iformat == 0:
-                    # RGBA -> BGRA (little endian)
-                    row[i], row[i + 2] = row[i + 2], row[i]
-                else:
-                    # RGBA -> ARGB (big endian)
-                    row[i:i+4] = row[i+3:i+4] + row[i:i+3]
-            image.pixels[dst_start:dst_start + width * 4] = row
-        return image
+        path = Path(image_path)
+        if (not path.exists() or not path.is_file()):
+            return Logger.get().e(f"Failed to create image: no file at path '{image_path}'.")
+        if (path.suffix == 'png'):
+            (ptr, width, height) = mlx.mlx_png_file_to_image(mlxprt, image_path)
+            if (ptr is None):
+                return Logger.get().e(f"Failed to create image: ptr is None.")
+            (p, bpp, sl, f) = mlx.mlx_get_data_addr(ptr) 
+            return MlxImage(
+                    pixels=p,
+                    bppixels=bpp,
+                    sizeline=sl,
+                    iformat=f,
+                    width=width,
+                    height=height,
+                    pointer=ptr,
+                    )
+        Logger.get().e(f"Failed to create image: unknown file extension '{path.suffix}'.")
     
     def destroy(self, mlx: Mlx, mptr: int) -> None:
         """

@@ -6,17 +6,17 @@
 - LICENSE.md
 
 # TODO
-- [ ] Maze modeling
+- [x] Maze modeling
     - [ ] Cell representation (code)
     - [ ] Maze representation (code)
-- [ ] Configuration parsing
-    - [ ] Key value pair setting
-    - [ ] Invalid pair handling
-    - [ ] Comment handling
-- [ ] Perfect maze gen algorithm
-- [ ] Non-perfect maze gen algorithm
+- [x] Configuration parsing
+    - [x] Key value pair setting
+    - [x] Invalid pair handling
+    - [x] Comment handling
+- [x] Perfect maze gen algorithm
+- [x] Non-perfect maze gen algorithm
 - [ ] Unit tests
-- [ ] Visual maze representation (MiniLibX or ASCII)
+- [x] Visual maze representation (MiniLibX or ASCII) (arguably)
 - [ ] Visual display user interaction
     - [ ] Maze regeneration 
     - [ ] Show/hide shortest path to exit

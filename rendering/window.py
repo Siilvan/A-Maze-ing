@@ -11,7 +11,7 @@ from logger import Logger
 logger = Logger.get()
 IMG_DIR = Path(__file__).resolve().parent / "./images/"
 CELL_SIZE = 16
-CELL_SCALE = 5
+CELL_SCALE = 3
 N, E, S, W = 1, 2, 4, 8
 
 class MlxWindow:
@@ -83,7 +83,7 @@ class MlxWindow:
         #
         # if (cell in self.image_cache):
         #     return self.image_cache[cell]
-        # logger.i(f"{cell} not cached, creating new image")
+        logger.i(f"{cell} not cached, creating new image")
         path: str = self._get_cell_image_path(cell)
         img: MlxImage = MlxImage.from_image(self.mlx, self.mptr, path, scale=CELL_SCALE)
         self.image_cache[cell] = img
