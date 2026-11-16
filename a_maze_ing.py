@@ -2,7 +2,9 @@ from pathlib import Path
 
 from maze_generator import MazeConfig, RowByRowMazeGenerator
 from logger import Logger
-from rendering import MlxWindow, CELL_SCALE, CELL_SIZE
+from rendering.canvas import Canvas
+from rendering.canvas_elements import CanvasText
+from rendering.window import MlxWindow
 
 def load_conf(conf_path: str) -> MazeConfig | None:
     """
@@ -22,17 +24,18 @@ def load_conf(conf_path: str) -> MazeConfig | None:
 
 
 def main() -> None:
-    conf: MazeConfig | None = load_conf("maze.conf")
-    if (conf is None):
-        Logger.get().e("Failed to load configuration.")
-        return
-    generator = RowByRowMazeGenerator(conf)
-    generator.generate_maze()
-    grid : list[list[int]] = generator.get_maze()
+    # conf: MazeConfig | None = load_conf("maze.conf")
+    # if (conf is None):
+    #     Logger.get().e("Failed to load configuration.")
+    #     return
+    # generator = RowByRowMazeGenerator(conf)
+    # generator.generate_maze()
+    # grid : list[list[int]] = generator.get_maze()
     window: MlxWindow = MlxWindow()
-    window.init_window((CELL_SIZE * CELL_SCALE * conf.width,
-                        CELL_SIZE * CELL_SCALE * conf.height))
-    window.draw_maze(grid)
+    canvas: Canvas = Canvas(window)  # pyright: ignore[reportArgumentType]
+    label: CanvasText = CanvasText("Hello World")
+    canvas.add_child(label)
+    canvas.render_canvas()
     window.loop()
 
 if __name__ == "__main__":
