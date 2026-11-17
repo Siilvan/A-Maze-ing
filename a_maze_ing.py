@@ -1,4 +1,5 @@
 from pathlib import Path
+import time
 
 from maze_generator import MazeConfig, RowByRowMazeGenerator, errors
 from solver import SolverBot
@@ -27,6 +28,11 @@ def load_conf(conf_path: str) -> MazeConfig | None:
     return None
 
 
+def main_loop(delta: float, c: Canvas) -> None:
+    c.clear_canvas()
+    c.tick()
+    c.render_canvas()
+
 def main() -> None:
     conf: MazeConfig | None = load_conf("maze.conf")
     if (conf is None):
@@ -41,16 +47,17 @@ def main() -> None:
     # window: MazeWindow = MazeWindow(maze)
     # window.draw_maze()
     window: MlxWindow = MlxWindow()
-    window.init_window((1920, 1080), Colors.DARK_GRAY)
-    canvas: Canvas = Canvas(window)
-    container: CanvasHBoxContainer = CanvasHBoxContainer()
+    window.init_window((1920, 1080), Colors.DARK_GRAY, "Hello")
+    canvas: Canvas = Canvas(window, main_loop)
+    container: CanvasHBoxContainer = CanvasHBoxContainer(60, 24)
     container.global_position += Vector2(100, 100)
     canvas.add_child(container)
     for i in range(10):
         label: CanvasText = CanvasText(f"H{i}lo", 24, Colors.FOREST_GREEN)
         container.add_child(label)
-    canvas.render_canvas(debug=True)
+    i = 0
     window.loop()
+
 
 if __name__ == "__main__":
     main()

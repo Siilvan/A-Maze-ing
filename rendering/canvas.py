@@ -1,12 +1,15 @@
 from abc import ABC, abstractmethod
 from cmath import rect
 from enum import Enum
+import time
+from tracemalloc import start
 from turtle import position
+from typing import Callable
 
 from mlx import Mlx
 
 from logger import Logger
-from rendering.colors import Colors
+from rendering.colors import Color, Colors
 from rendering.image import MlxImage
 from rendering.vector import Vector2
 from rendering.window import MlxWindow
@@ -30,8 +33,13 @@ class Rect:
         Returns wether or not the specified point is within the bounds
         of the rect
         """
-        return (point.x >= self.start.x and point.x <= self.end.x
-            and point.y >= self.start.y and point.y <= self.start.y)
+        return (point >= self.start and point <= self.end)
+
+    def __repr__(self) -> str:
+        return self.__str__()
+
+    def __str__(self) -> str:
+        return f"Rect(size={self.size}, start={self.start}, end={self.end})"
 
 class CanvasElement(ABC):
 
@@ -77,7 +85,34 @@ class CanvasElement(ABC):
         if (debug):
             self.draw_rect()
 
+    def clear(self) -> None:
+        if (self.rect.size == Vector2(0, 0)):
+            return
+        image: MlxImage = MlxImage.new_image(self.window.mlx,
+                                             self.window.mptr,
+                                             self.rect.size.x,
+                                             self.rect.size.y)
+        image.clear_image(self.window.bg)
+        self.window.put_image(image, self.global_position.x, self.global_position.y)
+        image.destroy(self.window.mlx, self.window.mptr)
+
+    def tick(self) -> None:
+        """
+        Gets called every frame, do not override.
+        """
+        self._tick()
+        for c in self.children:
+            c.tick()
+
+    def on_mouse_press(self, button: int, pos: Vector2) -> None:
+        self._on_mouse_press(button, pos)
+        for c in self.children:
+            c.on_mouse_press(button, pos)
+
     def draw_rect(self) -> None:
+        """
+        Draws the borders of this object. Used for debug purposes
+        """
         if (not self._initialized):
             return Logger.get().e("Cannot draw rect of an uninitialized element.")
         image: MlxImage = MlxImage.new_image(self.window.mlx, self.window.mptr,
@@ -91,6 +126,13 @@ class CanvasElement(ABC):
         self.window.put_image(image, self.global_position.x, self.global_position.y)
         image.destroy(self.window.mlx, self.window.mptr)
 
+    def _on_mouse_press(self, button: int, pos: Vector2) -> None:
+        """
+        Handles mouse presses with `button` being the button, and `pos`
+        the position of the cursor
+        """
+        pass
+
     def _initialize(self) -> None:
         """
         _initialize method gets called when the child element is added as a child
@@ -98,8 +140,17 @@ class CanvasElement(ABC):
         pass
 
     def _draw(self) -> None:
+        """
+        Renders this object on screen
+        """
         for c in self.children:
             c.draw()
+
+    def _tick(self) -> None:
+        """
+        Gets called every frame
+        """
+        pass
 
     def add_child(self, child: "CanvasElement"):
         """
@@ -119,7 +170,6 @@ class CanvasElement(ABC):
         self.children.remove(child)
         child.parent = None
 
-
     def is_hovering(self, mouse_pos: Vector2) -> bool:
         return (self.rect.has_point(mouse_pos))
 
@@ -131,14 +181,42 @@ class Canvas:
         BOT_LEFT = (0, 1)
         BOT_RIGHT = (1, 1)
 
-    def __init__(self, window: MlxWindow) -> None:
+    def __init__(self, window: MlxWindow, main: Callable) -> None:
         self.window = window
+        self.delta: float = 0
+        self.main = main
         self.children: list[CanvasElement] = []
+        self.window.hook_mouse_press(self.catch_mouse_press)
+        self.window.hook_loop(self.process_loop, None)
+
+    def process_loop(self, _p: None):
+        now = time.perf_counter()
+        self.main(now - self.delta, self)
+        self.delta = time.perf_counter()
+
+    def tick(self) -> None:
+        for c in self.children:
+            c.tick()
+
+    def catch_mouse_press(self, button: int, x: int, y: int, _p : None):
+        for c in self.children:
+            c.on_mouse_press(button, Vector2(x, y))
+
+    def get_mouse_pos(self) -> Vector2:
+        pos: tuple[int, int, int] = self.window.mlx.mlx_mouse_get_pos(self.window.mptr)
+        return Vector2(pos[1], pos[2])
 
     def add_child(self, element: CanvasElement) -> None:
         element.initialize(self.window)
         self.children.append(element)
 
+    def clear_canvas(self) -> None:
+        for c in self.children:
+            c.clear()
+
     def render_canvas(self, debug: bool = False):
         for c in self.children:
             c.draw(debug)
+
+    def _on_mouse_press(self):
+        pass

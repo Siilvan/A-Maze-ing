@@ -1,3 +1,5 @@
+from typing import Any, Callable
+
 from mlx import Mlx
 
 from logger import Logger
@@ -28,7 +30,24 @@ class MlxWindow:
         self.width: int = size[0]
         self.height: int = size[1]
         self.wptr: int = self.mlx.mlx_new_window(self.mptr, self.width, self.height, name)
+        self.bg = bg
         self._setup(bg)
+
+    def hook_mouse_press(self, func: Callable[[int, int, int, None], None]) -> None:
+        """
+        Hooks the provided function to the mouse press event
+        the callback should match the following signature:
+        callback(button: int, x: int, y: int)
+        """
+        self.mlx.mlx_mouse_hook(self.wptr, func, None)
+
+    def hook_loop(self, func: Callable, param: Any = None) -> None:
+        """
+        Hooks the provided function to the main loop.
+        signature must match:
+        callback(void)
+        """
+        self.mlx.mlx_loop_hook(self.mptr, func, param)
 
     def loop(self) -> None:
         """

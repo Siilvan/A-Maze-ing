@@ -11,6 +11,11 @@ class CanvasHBoxContainer(CanvasElement):
         super().__init__()
 
     @override
+    def _on_mouse_press(self, button: int, pos: Vector2) -> None:
+        if (self.rect.has_point(pos)):
+            print(f"Pressed in me!")
+
+    @override
     def _draw(self) -> None:
         width: int = self.padding
         height: int = self.padding

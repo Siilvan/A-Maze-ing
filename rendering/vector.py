@@ -20,6 +20,26 @@ class Vector2:
             raise TypeError("Second argument is not a vector.") 
         return (self.x == value.x and self.y == value.y)
 
+    def __lt__(self, other: object) -> bool:
+        if (not isinstance(other, Vector2)):
+            raise TypeError("Second argument is not a vector.") 
+        return (self.x < other.x and self.y < other.y)
+
+    def __le__(self, other: object) -> bool:
+        if (not isinstance(other, Vector2)):
+            raise TypeError("Second argument is not a vector.") 
+        return (self.x <= other.x and self.y <= other.y)
+
+    def __gt__(self, other: object) -> bool:
+        if (not isinstance(other, Vector2)):
+            raise TypeError("Second argument is not a vector.") 
+        return (self.x > other.x and self.y > other.y)
+
+    def __ge__(self, other: object) -> bool:
+        if (not isinstance(other, Vector2)):
+            raise TypeError("Second argument is not a vector.") 
+        return (self.x >= other.x and self.y >= other.y)
+
     def __repr__(self) -> str:
         return self.__str__()
 
