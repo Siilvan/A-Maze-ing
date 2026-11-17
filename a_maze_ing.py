@@ -3,17 +3,11 @@ from pathlib import Path
 from maze_generator import MazeConfig, RowByRowMazeGenerator, errors
 from solver import SolverBot
 from logger import Logger
-<<<<<<< HEAD
 from rendering.canvas import Canvas
 from rendering.canvas_elements import CanvasText
 from rendering.colors import Colors
 from rendering.maze_window import MazeWindow
 from rendering.window import MlxWindow
-=======
-from rendering.window import CELL_SCALE, CELL_SIZE, MlxWindow
-import stupid_claude_draw_test_func as d
-import time
->>>>>>> 4f16952881e9d5ac07b9ab846a06d0d385773782
 
 def load_conf(conf_path: str) -> MazeConfig | None:
     """
