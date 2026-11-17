@@ -58,7 +58,7 @@ CHARS: dict[str, list[str]] = {
     '{': [".##", ".#.", "##.", ".#.", ".##"],
     '}': ["##.", ".#.", ".##", ".#.", "##."],
     '<': ["..#", ".#.", "#..", ".#.", "..#"],
-    '>': ["#..", ".#.", "..#", ".#.", "..#"]
+    '>': ["#..", ".#.", "..#", ".#.", "#.."]
 }
 
 class Logos():
@@ -124,6 +124,6 @@ class Logos():
 
     def GridNumbers(self, char: str) -> list[list[bool]]:
         if char not in CHARS:
-            Logger.get().i(f"No Glyph for: {char}. Using space instead.")
+            Logger.get().w(f"No Glyph for: {char}. Using space instead.")
             char = ' '
         return [[c == '#' for c in row] for row in CHARS[char]]
