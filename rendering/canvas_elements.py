@@ -23,7 +23,6 @@ class CanvasButton(CanvasElement):
         return super()._draw()
 
 class CanvasText(CanvasElement):
-    _char_table: dict[str, MlxImage] = {}
     FONT_DIR: Path = Path(__file__).resolve().parent / "./static/fonts/"
 
     def __init__(self, text: str, font_size: int = 12, color: Color = Colors.BLACK) -> None:

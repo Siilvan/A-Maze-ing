@@ -18,12 +18,24 @@ class Color:
                 )
 
     def to_tuple(self) -> tuple[int, int, int, int]:
+        """
+        Returns a tuple of the color under the form (r, g, b, a)
+        """
         return (self.r, self.g, self.b, self.a)
 
     def to_int(self) -> int:
+        """
+        Returns a single integer representative of the color.
+        format 0xAARRGGBB
+        """
         return (self.a << 24) | (self.r << 16) | (self.g << 8) | self.b
 
     def to_bytes(self, cformat: int = 0) -> bytes:
+        """
+        Returns the bytes of a color, cformat specifying the format:
+        0: BGRA
+        1: ARGB
+        """
         if (cformat == 0):
             return bytes([self.b, self.g, self.r, self.a])
         else:

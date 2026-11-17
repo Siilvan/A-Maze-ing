@@ -72,29 +72,6 @@ class MlxImage:
                     row[i:i+4] = row[i+3:i+4] + row[i:i+3]
             image.pixels[dst_start:dst_start + width * 4] = row
         return image
-        # path = Path(image_path)
-        # if (not path.exists() or not path.is_file()):
-        #     return Logger.get().e(f"Failed to create image: no file at path '{image_path}'.")
-        # if (path.suffix == '.png'):
-        #     (ptr, width, height) = mlx.mlx_png_file_to_image(mlxptr, image_path)
-        # elif (path.suffix == '.xpm'):
-        #     (ptr, width, height) = mlx.mlx_xpm_file_to_image(mlxptr, image_path)
-        # else:
-        #     return Logger.get().e(
-        #             f"Failed to create image: ({image_path}) unknown file extension '{path.suffix}'."
-        #             )
-        # if (ptr is None):
-        #     return Logger.get().e(f"Failed to create image: ptr is None.")
-        # (p, bpp, sl, f) = mlx.mlx_get_data_addr(ptr) 
-        # return MlxImage(
-        #         pixels=p,
-        #         bppixels=bpp,
-        #         sizeline=sl,
-        #         iformat=f,
-        #         width=width,
-        #         height=height,
-        #         pointer=ptr,
-        #         )
     
     def destroy(self, mlx: Mlx, mptr: int) -> None:
         """
