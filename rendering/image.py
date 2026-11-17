@@ -1,12 +1,14 @@
+from pathlib import Path
+
 from mlx import Mlx
-from PIL import Image
+from PIL import Image, ImageFont
 
+from logger import Logger
 from rendering.colors import Color, Colors
-
 
 class MlxImage:
     """
-    Class to store the data of an image from the mlx_get_data_addr call
+    Class to store an Mlx image
     """
     def __init__(self, pixels: memoryview,
                  bppixels: int,
@@ -44,7 +46,7 @@ class MlxImage:
                 )
 
     @classmethod
-    def from_image(cls, mlx: Mlx, mlxprt: int, image_path: str, scale: float = 1) -> "MlxImage":
+    def from_image(cls, mlx: Mlx, mlxptr: int, image_path: str, scale: float = 1) -> "MlxImage | None":
         """
         Creates a new MlxImage instance from an existing image
         """
@@ -54,7 +56,7 @@ class MlxImage:
             height = round(pimg.height * scale)
             pimg = pimg.resize((width, height), Image.Resampling.NEAREST)
         width, height = pimg.size
-        image = MlxImage.new_image(mlx, mlxprt, width, height)
+        image = MlxImage.new_image(mlx, mlxptr, width, height)
         src = pimg.tobytes()
         for y in range(height):
             src_start = y * width * 4

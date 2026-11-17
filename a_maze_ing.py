@@ -3,9 +3,17 @@ from pathlib import Path
 from maze_generator import MazeConfig, RowByRowMazeGenerator, errors
 from solver import SolverBot
 from logger import Logger
+<<<<<<< HEAD
+from rendering.canvas import Canvas
+from rendering.canvas_elements import CanvasText
+from rendering.colors import Colors
+from rendering.maze_window import MazeWindow
+from rendering.window import MlxWindow
+=======
 from rendering.window import CELL_SCALE, CELL_SIZE, MlxWindow
 import stupid_claude_draw_test_func as d
 import time
+>>>>>>> 4f16952881e9d5ac07b9ab846a06d0d385773782
 
 def load_conf(conf_path: str) -> MazeConfig | None:
     """
@@ -35,26 +43,16 @@ def main() -> None:
     except errors.ManualExit as e:
         print(f"{e} hw")
     grid : list[list[int]] = generator.get_maze()
-    window: MlxWindow = MlxWindow()
-    window.init_window((CELL_SIZE * CELL_SCALE * conf.width, CELL_SIZE * CELL_SCALE * conf.height),
-                       )
-    window.draw_maze(grid)
-    window.loop()
-
-    # logger1 = Logger().get()
-    # logger2 = Logger().get()
-    # print(f"1: {logger1}, 2: {logger2}")
-    # d.draw_maze(generator.get_maze())
-    # solver = SolverBot(grid, conf)
-    # start = time.time()
-    # res = solver.solve(True)
-    # end_time = time.time()
-    # print(f"time: {end_time - start}\n result: {res} \n len: {len(res)}")
-    # start = time.time()
-    # res = solver.solve(False)
-    # end_time = time.time()
-    # print(f"time: {end_time - start}\n result: {res} \n len: {len(res)}")
-    
+    window: MazeWindow = MazeWindow(grid)
+    window.draw_maze()
+    # window: MlxWindow = MlxWindow()
+    # window.init_window((1920, 1080), Colors.DARK_GRAY)
+    # canvas: Canvas = Canvas(window)
+    # label: CanvasText = CanvasText("Hello World", 60, Colors.FOREST_GREEN)
+    # label.global_position = (100, 0)
+    # canvas.add_child(label)
+    # canvas.render_canvas()
+    # window.loop()
 
 if __name__ == "__main__":
     main()
