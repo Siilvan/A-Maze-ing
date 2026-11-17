@@ -22,7 +22,7 @@ class MazeGenerator(ABC):
             [15 for _ in range(self.width)]
             for _ in range(self.height)]
         self.perfect = conf.perfect
-        self.blocked: list[list[bool]] = Logos("42", conf).MakeLogo()
+        self.blocked: list[list[bool]] = Logos("", conf).MakeLogo()
 
     def get_maze(self) -> list[list[int]]:
         return self.grid
@@ -154,6 +154,7 @@ class RowByRowMazeGenerator(MazeGenerator):
         self.new_sets: list[int] = []
         self.next_id = 1
 
+    @override
     def initial_grid(self) -> None:
         self.compute_can_continue()
         for y in range(self.height):

@@ -1,9 +1,11 @@
 from pathlib import Path
 
-from maze_generator import MazeConfig, RowByRowMazeGenerator
+from maze_generator import MazeConfig, RowByRowMazeGenerator, errors
+from solver import SolverMother
 from logger import Logger
 from rendering.window import CELL_SCALE, CELL_SIZE, MlxWindow
-import stupid_claude_draw_test_func as e
+import stupid_claude_draw_test_func as d
+import time
 
 def load_conf(conf_path: str) -> MazeConfig | None:
     """
@@ -28,7 +30,10 @@ def main() -> None:
         Logger.get().e("Failed to load configuration.")
         return
     generator = RowByRowMazeGenerator(conf)
-    generator.generate_maze()
+    try:
+        generator.generate_maze()
+    except errors.ManualExit as e:
+        print(f"{e} hw")
     grid : list[list[int]] = generator.get_maze()
     # window: MlxWindow = MlxWindow()
     # window.init_window((CELL_SIZE * CELL_SCALE * conf.width, CELL_SIZE * CELL_SCALE * conf.height),
@@ -39,7 +44,17 @@ def main() -> None:
     # logger1 = Logger().get()
     # logger2 = Logger().get()
     # print(f"1: {logger1}, 2: {logger2}")
-    e.draw_maze(generator.grid)
+    d.draw_maze(generator.get_maze())
+    solver = SolverMother(grid, conf)
+    start = time.time()
+    solver.solve(True)
+    end_time = time.time()
+    print(f"{end_time - start}")
+    start = time.time()
+    solver.solve(False)
+    end_time = time.time()
+    print(f"{end_time - start}")
+    
 
 if __name__ == "__main__":
     main()

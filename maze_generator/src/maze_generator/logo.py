@@ -1,6 +1,8 @@
 from . import MazeConfig
-from logger import Logger
+from maze_generator import errors
 from collections import deque
+from logger import Logger
+import sys
 
 CHARS: dict[str, list[str]] = {
     '0': ["##.", "#.#", "#.#", "#.#", ".##"],
@@ -71,7 +73,8 @@ class Logos():
     def MakeLogo(self) -> list[list[bool]]:
         glyph_rows = 5
         logo_grid: list[list[bool]] = [[] for _ in range(glyph_rows)]
-
+        if not self.logo:
+            return[[False for _ in range(self.width)] for _ in range(self.height)]
         for i, char in enumerate(self.logo):
             glyph = self.GridNumbers(char.upper())
             for r in range(glyph_rows):
@@ -81,9 +84,16 @@ class Logos():
 
         logo_width = len(logo_grid[0])
         if self.width < logo_width + 2 or self.height < 7:
-            raise Exception(
-                f"Maze too small: must be at least {logo_width + 2}"
-                f" wide and 7 high.")
+            Logger.get().i(f"Maze too small: must be at least {logo_width + 2}"
+                           f" wide and 7 high.")
+            Logger.get().i("Continue printing maze without logo? (y/n) ", end="")
+            sys.stdout.flush()
+            y_n = sys.stdin.readline().strip()
+            if y_n.lower() == 'y':
+                return [[False for _ in range(self.width)]
+                        for _ in range(self.height)]
+            else:
+                raise errors.ManualExit("User exited the program - quitting.")
         start_r = (self.height - glyph_rows) // 2
         start_c = (self.width - logo_width) // 2
 
@@ -114,5 +124,6 @@ class Logos():
 
     def GridNumbers(self, char: str) -> list[list[bool]]:
         if char not in CHARS:
-            raise errors.CharNotFound(f"no glyph for {char!r}")
+            Logger.get().i(f"No Glyph for: {char}. Using space instead.")
+            char = ' '
         return [[c == '#' for c in row] for row in CHARS[char]]

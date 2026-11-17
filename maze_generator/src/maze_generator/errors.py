@@ -6,3 +6,6 @@ class MazeGenerationException(Exception):
 
 class CharNotFound(Exception):
     pass
+
+class ManualExit(Exception):
+    pass
