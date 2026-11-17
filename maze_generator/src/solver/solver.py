@@ -18,10 +18,11 @@ class SolverMother():
 
     def solve(self, fast: bool) -> list[tuple[int, int]]:
         if fast:
-            print(self.fast_solve())
+            result = self.fast_solve()
         else:
             self.start_solver()
-            shortest = 
+            result = min(self.paths, key=len) if self.paths else None
+        return result
     
     def fast_solve(self) -> list[tuple[int, int]] | None:
         queue = deque([self.entry])
@@ -35,6 +36,7 @@ class SolverMother():
                     path.append(curr_cell)
                     curr_cell = parent_cell[curr_cell]
                 path.append(self.entry)
+                path.reverse()
                 return path
             for path in self.get_paths(curr_cell):
                 y_dir, x_dir = DIRS[path][1:]
@@ -46,6 +48,8 @@ class SolverMother():
                 parent_cell[neighbour] = curr_cell
 
     def start_solver(self):
+        self.paths = []
+        best_path: dict[tuple[int, int], int] = {}
         with concurrent.futures.ProcessPoolExecutor() as executor:
             futures = {executor.submit(self.walk_path, self.entry, coords=[self.entry])}
             
@@ -54,23 +58,23 @@ class SolverMother():
                     futures, return_when=concurrent.futures.FIRST_COMPLETED
                 )
                 for future in done:
-                    result = future.result()
-                    if result[0] == True:
-                        self.paths.append(result[2])
-                    if result[1]:
-                        for path in result[1]:
-                            futures.add(
-                                executor.submit(self.walk_path,
-                                    result[2][len(result[2]) - 1],
-                                    result[2], path))
-
+                    found, branches, coords = future.result()
+                    if found:
+                        self.paths.append(coords)
+                    if not branches:
+                        continue
+                    junction = coords[-1]
+                    if len(coords) >= best_path.get(junction, float("inf")):
+                        continue
+                    best_path[junction] = len(coords)
+                    for path in branches:
+                        futures.add(
+                            executor.submit(self.walk_path, junction, coords, path))
+        
     def walk_path(self, pos: list[int, int], coords: list[tuple[int, int]] = [], s_move: int = None) -> tuple[bool, list[int], list[tuple[int, int]]]:
         coord_list = [c for c in (coords or [pos])]
         curr_pos = coord_list[-1]
         seen = set(coord_list)
-        # paths = self.get_paths(curr_pos)
-        # if s_move is not None:
-        #     paths = self.update_vars(curr_pos, coord_list, s_move)
         if s_move is not None:
             paths = [s_move]
         else:

@@ -47,13 +47,13 @@ def main() -> None:
     d.draw_maze(generator.get_maze())
     solver = SolverMother(grid, conf)
     start = time.time()
-    solver.solve(True)
+    res = solver.solve(True)
     end_time = time.time()
-    print(f"{end_time - start}")
+    print(f"time: {end_time - start}\n result: {res} \n len: {len(res)}")
     start = time.time()
-    solver.solve(False)
+    res = solver.solve(False)
     end_time = time.time()
-    print(f"{end_time - start}")
+    print(f"time: {end_time - start}\n result: {res} \n len: {len(res)}")
     
 
 if __name__ == "__main__":
