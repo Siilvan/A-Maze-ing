@@ -17,6 +17,7 @@ class MazeConfig:
                  perfect: bool = False,
                  width: int = 50,
                  height: int = 50,
+                 logo:str = "42"
                  ) -> None:
         self.width: int = width
         self.height: int = height
@@ -28,6 +29,7 @@ class MazeConfig:
             self.exit_pos = exit_pos
         self.output_path: str = output_path
         self.perfect: bool = perfect
+        self.logo: str = logo
 
     def validate_config(self) -> bool:
         """
