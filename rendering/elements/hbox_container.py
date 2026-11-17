@@ -15,7 +15,9 @@ class CanvasHBoxContainer(CanvasElement):
         height: int = 0
         for i, c in enumerate(self.children):
             if (i != 0 and i < len(self.children)):
+                print(c.position)
                 c.position = Vector2(width + self.spacing, c.position.y)
+                print(c.global_position)
                 width += self.spacing
             c.draw()
             width += c.rect.size.x

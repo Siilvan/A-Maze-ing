@@ -40,8 +40,6 @@ class CanvasElement(ABC):
         self.parent: CanvasElement | None = None
         # Position on screen
         self.global_position: Vector2 = Vector2(0, 0)
-        # Position based on parent's position
-        self._position: Vector2 = self.global_position
         self.rect: Rect = Rect.empty()
         self.children: list[CanvasElement] = []
         super().__init__()
@@ -54,11 +52,10 @@ class CanvasElement(ABC):
 
     @position.setter
     def position(self, p: Vector2):
-        self._position = p
         if (self.parent is not None):
-            self.global_position = self.parent.global_position + self._position
+            self.global_position = self.parent.global_position + p
         else:
-            self.global_position = self._position
+            self.global_position = p
 
     def initialize(self, window: MlxWindow) -> None:
         if (self._initialized):
@@ -77,6 +74,7 @@ class CanvasElement(ABC):
         if (not self._initialized):
             return Logger.get().e("Cannot draw an uninitialized element.")
         self._draw()
+        self.draw_rect()
 
     def draw_rect(self) -> None:
         if (not self._initialized):
@@ -108,6 +106,7 @@ class CanvasElement(ABC):
         """
         if (not self._initialized):
             return Logger.get().e(f"({self})Cannot add child to uninitialized element.")
+        child.global_position = self.global_position
         self.children.append(child)
         child.parent = self
         child.initialize(self.window)

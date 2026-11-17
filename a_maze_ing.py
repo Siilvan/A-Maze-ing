@@ -7,6 +7,7 @@ from rendering.canvas import Canvas
 from rendering.colors import Colors
 from rendering.elements.hbox_container import CanvasHBoxContainer
 from rendering.elements.text import CanvasText
+from rendering.vector import Vector2
 from rendering.window import MlxWindow
 
 def load_conf(conf_path: str) -> MazeConfig | None:
@@ -43,6 +44,7 @@ def main() -> None:
     window.init_window((1920, 1080), Colors.DARK_GRAY)
     canvas: Canvas = Canvas(window)
     container: CanvasHBoxContainer = CanvasHBoxContainer()
+    container.global_position += Vector2(100, 100)
     canvas.add_child(container)
     for i in range(5):
         label: CanvasText = CanvasText(f"H{i}lo", 24, Colors.FOREST_GREEN)
