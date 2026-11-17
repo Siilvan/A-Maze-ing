@@ -1,3 +1,3 @@
-from .solver import SolverMother
+from .solver import SolverBot
 
 __all__ = ['SolverMother']

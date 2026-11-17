@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from maze_generator import MazeConfig, RowByRowMazeGenerator, errors
-from solver import SolverMother
+from solver import SolverBot
 from logger import Logger
 from rendering.window import CELL_SCALE, CELL_SIZE, MlxWindow
 import stupid_claude_draw_test_func as d
@@ -35,25 +35,25 @@ def main() -> None:
     except errors.ManualExit as e:
         print(f"{e} hw")
     grid : list[list[int]] = generator.get_maze()
-    # window: MlxWindow = MlxWindow()
-    # window.init_window((CELL_SIZE * CELL_SCALE * conf.width, CELL_SIZE * CELL_SCALE * conf.height),
-    #                    )
-    # window.draw_maze(grid)
-    # window.loop()
+    window: MlxWindow = MlxWindow()
+    window.init_window((CELL_SIZE * CELL_SCALE * conf.width, CELL_SIZE * CELL_SCALE * conf.height),
+                       )
+    window.draw_maze(grid)
+    window.loop()
 
     # logger1 = Logger().get()
     # logger2 = Logger().get()
     # print(f"1: {logger1}, 2: {logger2}")
-    d.draw_maze(generator.get_maze())
-    solver = SolverMother(grid, conf)
-    start = time.time()
-    res = solver.solve(True)
-    end_time = time.time()
-    print(f"time: {end_time - start}\n result: {res} \n len: {len(res)}")
-    start = time.time()
-    res = solver.solve(False)
-    end_time = time.time()
-    print(f"time: {end_time - start}\n result: {res} \n len: {len(res)}")
+    # d.draw_maze(generator.get_maze())
+    # solver = SolverBot(grid, conf)
+    # start = time.time()
+    # res = solver.solve(True)
+    # end_time = time.time()
+    # print(f"time: {end_time - start}\n result: {res} \n len: {len(res)}")
+    # start = time.time()
+    # res = solver.solve(False)
+    # end_time = time.time()
+    # print(f"time: {end_time - start}\n result: {res} \n len: {len(res)}")
     
 
 if __name__ == "__main__":

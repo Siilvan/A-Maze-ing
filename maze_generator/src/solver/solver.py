@@ -9,7 +9,7 @@ DIRS: dict[int, tuple[str, int, int]] = {
     3: ("W", 0, -1)
     }
 
-class SolverMother():
+class SolverBot():
     def __init__(self, grid: list[list[int]], conf: MazeConfig) -> None:
         self.grid = grid
         self.entry = tuple(conf.entry_pos)
@@ -20,7 +20,7 @@ class SolverMother():
         if fast:
             result = self.fast_solve()
         else:
-            self.start_solver()
+            self.slow_solve()
             result = min(self.paths, key=len) if self.paths else None
         return result
     
@@ -47,7 +47,7 @@ class SolverMother():
                 visited.add(neighbour)
                 parent_cell[neighbour] = curr_cell
 
-    def start_solver(self):
+    def slow_solve(self):
         self.paths = []
         best_path: dict[tuple[int, int], int] = {}
         with concurrent.futures.ProcessPoolExecutor() as executor:
