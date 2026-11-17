@@ -4,9 +4,8 @@ from maze_generator import MazeConfig, RowByRowMazeGenerator, errors
 from solver import SolverBot
 from logger import Logger
 from rendering.canvas import Canvas
-from rendering.canvas_elements import CanvasText
 from rendering.colors import Colors
-from rendering.maze_window import MazeWindow
+from rendering.elements.text import CanvasText
 from rendering.window import MlxWindow
 
 def load_conf(conf_path: str) -> MazeConfig | None:
@@ -36,17 +35,17 @@ def main() -> None:
         generator.generate_maze()
     except errors.ManualExit as e:
         print(f"{e} hw")
-    grid : list[list[int]] = generator.get_maze()
-    window: MazeWindow = MazeWindow(grid)
-    window.draw_maze()
-    # window: MlxWindow = MlxWindow()
-    # window.init_window((1920, 1080), Colors.DARK_GRAY)
-    # canvas: Canvas = Canvas(window)
-    # label: CanvasText = CanvasText("Hello World", 60, Colors.FOREST_GREEN)
-    # label.global_position = (100, 0)
-    # canvas.add_child(label)
-    # canvas.render_canvas()
-    # window.loop()
+    # grid : list[list[int]] = generator.get_maze()
+    # window: MazeWindow = MazeWindow(grid)
+    # window.draw_maze()
+    window: MlxWindow = MlxWindow()
+    window.init_window((1920, 1080), Colors.DARK_GRAY)
+    canvas: Canvas = Canvas(window)
+    label: CanvasText = CanvasText("Hello World", 60, Colors.FOREST_GREEN)
+    label.global_position = (100, 0)
+    canvas.add_child(label)
+    canvas.render_canvas()
+    window.loop()
 
 if __name__ == "__main__":
     main()

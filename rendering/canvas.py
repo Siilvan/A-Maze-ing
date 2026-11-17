@@ -49,6 +49,14 @@ class CanvasElement(ABC):
                     )
         self.window = window
         self._initialized = True
+        self._initialize()
+
+    @abstractmethod
+    def _initialize(self) -> None:
+        """
+        _initialize method gets called when the child element is added as a child
+        """
+        pass
 
     def add_child(self, child: "CanvasElement"):
         """
