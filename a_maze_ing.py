@@ -5,6 +5,7 @@ from solver import SolverBot
 from logger import Logger
 from rendering.canvas import Canvas
 from rendering.colors import Colors
+from rendering.elements.hbox_container import CanvasHBoxContainer
 from rendering.elements.text import CanvasText
 from rendering.window import MlxWindow
 
@@ -36,15 +37,18 @@ def main() -> None:
     except errors.ManualExit as e:
         print(f"{e} hw")
     # grid : list[list[int]] = generator.get_maze()
-    # window: MazeWindow = MazeWindow(grid)
+    # window: MazeWindow = MazeWindow(maze)
     # window.draw_maze()
     window: MlxWindow = MlxWindow()
     window.init_window((1920, 1080), Colors.DARK_GRAY)
     canvas: Canvas = Canvas(window)
-    label: CanvasText = CanvasText("Hello World", 60, Colors.FOREST_GREEN)
-    label.global_position = (100, 0)
-    canvas.add_child(label)
+    container: CanvasHBoxContainer = CanvasHBoxContainer()
+    canvas.add_child(container)
+    for i in range(5):
+        label: CanvasText = CanvasText(f"H{i}lo", 24, Colors.FOREST_GREEN)
+        container.add_child(label)
     canvas.render_canvas()
+    container.draw_rect()
     window.loop()
 
 if __name__ == "__main__":

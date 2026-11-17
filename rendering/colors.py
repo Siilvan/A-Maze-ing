@@ -93,3 +93,5 @@ class Colors(Color, Enum):
     TAN = (210, 180, 140)
     BEIGE = (245, 245, 220)
     CHOCOLATE = (210, 105, 30)
+
+    TRANSPARENT = (0, 0, 0, 0)
