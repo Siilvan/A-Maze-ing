@@ -66,7 +66,7 @@ class CanvasElement(ABC):
         self._initialized = True
         self._initialize()
 
-    def draw(self) -> None:
+    def draw(self, debug: bool = False) -> None:
         """
         Draws this canvas element on image.
         expects an image of size, screen size
@@ -74,7 +74,8 @@ class CanvasElement(ABC):
         if (not self._initialized):
             return Logger.get().e("Cannot draw an uninitialized element.")
         self._draw()
-        self.draw_rect()
+        if (debug):
+            self.draw_rect()
 
     def draw_rect(self) -> None:
         if (not self._initialized):
@@ -138,6 +139,6 @@ class Canvas:
         element.initialize(self.window)
         self.children.append(element)
 
-    def render_canvas(self):
+    def render_canvas(self, debug: bool = False):
         for c in self.children:
-            c.draw()
+            c.draw(debug)

@@ -46,11 +46,10 @@ def main() -> None:
     container: CanvasHBoxContainer = CanvasHBoxContainer()
     container.global_position += Vector2(100, 100)
     canvas.add_child(container)
-    for i in range(5):
+    for i in range(10):
         label: CanvasText = CanvasText(f"H{i}lo", 24, Colors.FOREST_GREEN)
         container.add_child(label)
-    canvas.render_canvas()
-    container.draw_rect()
+    canvas.render_canvas(debug=True)
     window.loop()
 
 if __name__ == "__main__":
