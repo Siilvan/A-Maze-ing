@@ -48,7 +48,7 @@ def main() -> None:
     # window.draw_maze()
     window: MlxWindow = MlxWindow()
     window.init_window((1920, 1080), Colors.DARK_GRAY, "Hello")
-    canvas: Canvas = Canvas(window, main_loop)
+    canvas: Canvas = Canvas(window)
     container: CanvasHBoxContainer = CanvasHBoxContainer(60, 24)
     container.global_position += Vector2(100, 100)
     canvas.add_child(container)
@@ -56,6 +56,7 @@ def main() -> None:
         label: CanvasText = CanvasText(f"H{i}lo", 24, Colors.FOREST_GREEN)
         container.add_child(label)
     i = 0
+    print(container.rect.end)
     window.loop()
 
 

@@ -181,18 +181,16 @@ class Canvas:
         BOT_LEFT = (0, 1)
         BOT_RIGHT = (1, 1)
 
-    def __init__(self, window: MlxWindow, main: Callable) -> None:
+    def __init__(self, window: MlxWindow) -> None:
         self.window = window
         self.delta: float = 0
-        self.main = main
         self.children: list[CanvasElement] = []
         self.window.hook_mouse_press(self.catch_mouse_press)
-        self.window.hook_loop(self.process_loop, None)
+        # self.window.hook_loop(self.process_loop, None)
 
-    def process_loop(self, _p: None):
-        now = time.perf_counter()
-        self.main(now - self.delta, self)
-        self.delta = time.perf_counter()
+    # def process_loop(self, _p: None):
+    #     self.clear_canvas()
+    #     self.render_canvas()
 
     def tick(self) -> None:
         for c in self.children:
