@@ -1,29 +1,20 @@
+
 from pathlib import Path
+from typing import override
 import uuid
 
-from PIL import Image, ImageFont, ImageDraw
-from typing import Callable, override
+from PIL import Image, ImageDraw, ImageFont
 
 from logger import Logger
+from rendering.canvas import CanvasElement, Rect
 from rendering.colors import Color, Colors
 from rendering.image import MlxImage
-
-from .canvas import CanvasElement, Rect
+from rendering.vector import Vector2
 
 logger = Logger.get()
 
-class CanvasButton(CanvasElement):
-    def __init__(self, text: str = "") -> None:
-        self.text = text
-        self.hooks: list[Callable] = []
-        super().__init__()
-
-    @override
-    def _draw(self) -> None:
-        return super()._draw()
-
 class CanvasText(CanvasElement):
-    FONT_DIR: Path = Path(__file__).resolve().parent / "./static/fonts/"
+    FONT_DIR: Path = Path(__file__).resolve().parent / "../static/fonts/"
 
     def __init__(self, text: str, font_size: int = 12, color: Color = Colors.BLACK) -> None:
         self.text = text
@@ -37,8 +28,8 @@ class CanvasText(CanvasElement):
         if (image is None):
             logger.e(f"Failed to generate image for string '{self.text}'")
             return
-        self.rect = Rect((image.width, image.height), self.global_position)
-        self.window.put_image(image, self.global_position[0], self.global_position[1])
+        self.rect = Rect(Vector2(image.width, image.height), self.global_position)
+        self.window.put_image(image, self.global_position.x, self.global_position.y)
         return super()._draw()
 
     def get_string_image(self, string: str) -> MlxImage | None:
@@ -52,6 +43,6 @@ class CanvasText(CanvasElement):
         draw = ImageDraw.Draw(im)
         draw.text((0, ascent - font.getbbox(string)[3]), string,
                       font=font, fill=self.color.to_tuple())
-        im_path: str = f"/tmp/PILtemp_{uuid.uuid1()}.png" 
+        im_path: str = f"/tmp/PILtemp.png" 
         im.save(im_path)
         return MlxImage.from_image(self.window.mlx, self.window.mptr, im_path)
