@@ -3,17 +3,13 @@ from pathlib import Path
 from maze_generator import MazeConfig, RowByRowMazeGenerator, errors
 from solver import SolverBot
 from logger import Logger
-<<<<<<< HEAD
 from rendering.canvas import Canvas
 from rendering.canvas_elements import CanvasText
 from rendering.colors import Colors
 from rendering.maze_window import MazeWindow
 from rendering.window import MlxWindow
-=======
-from rendering.window import CELL_SCALE, CELL_SIZE, MlxWindow
-import stupid_claude_draw_test_func as d
-import time
->>>>>>> 4f16952881e9d5ac07b9ab846a06d0d385773782
+from rendering import SettingsWindow
+from typing import Any
 
 def load_conf(conf_path: str) -> MazeConfig | None:
     """
@@ -43,16 +39,19 @@ def main() -> None:
     except errors.ManualExit as e:
         print(f"{e} hw")
     grid : list[list[int]] = generator.get_maze()
-    window: MazeWindow = MazeWindow(grid)
-    window.draw_maze()
-    # window: MlxWindow = MlxWindow()
-    # window.init_window((1920, 1080), Colors.DARK_GRAY)
-    # canvas: Canvas = Canvas(window)
-    # label: CanvasText = CanvasText("Hello World", 60, Colors.FOREST_GREEN)
+    # window: MazeWindow = MazeWindow(grid)
+    # window.draw_maze()
+    window: MlxWindow = MlxWindow()
+    window.init_window((2560, 1440), Colors.DARK_GRAY, "The A-Maze-ing Maze")
+    canvas: Canvas = Canvas(window)
+    # label: CanvasText = CanvasText("This is so a-Maze-ing", 60, Colors.FOREST_GREEN)
     # label.global_position = (100, 0)
     # canvas.add_child(label)
     # canvas.render_canvas()
-    # window.loop()
+    settings = SettingsWindow(conf, canvas)
+    settings.draw_settings()
+    window.loop()
+
 
 if __name__ == "__main__":
     main()

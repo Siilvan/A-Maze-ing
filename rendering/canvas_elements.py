@@ -55,4 +55,3 @@ class CanvasText(CanvasElement):
         im_path: str = f"/tmp/PILtemp_{uuid.uuid1()}.png" 
         im.save(im_path)
         return MlxImage.from_image(self.window.mlx, self.window.mptr, im_path)
-
