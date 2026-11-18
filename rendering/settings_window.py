@@ -3,12 +3,13 @@ from . import Canvas
 from .elements import CanvasText, CanvasTextBox, CanvasButton
 from .colors import Colors
 from . import Vector2
-from typing import Any
 
 
 class SettingsWindow():
-    def __init__(self, conf: MazeConfig, canvas: Canvas, conf_path: str) -> None:
-        self.set_dict = vars(conf)
+    def __init__(self, conf: MazeConfig,
+                 canvas: Canvas,
+                 conf_path: str
+                 ) -> None:
         self.canvas = canvas
         self.conf_path = conf_path
         self.settings_dict: dict[str, CanvasTextBox] = {}
@@ -23,23 +24,28 @@ class SettingsWindow():
         with open(self.conf_path, "w") as file:
             file.write(file_content)
 
-
     def draw_settings(self) -> None:
-        line = 0
-        for setting, set_val in self.set_dict.items():
-            parsed_val = str(set_val).rstrip("\n")
-            setting_key = CanvasText(f"{setting} = ", 30, Colors.RED)
-            setting_key.global_position = Vector2(20, line)
-            self.canvas.add_child(setting_key)
-            setting_key._draw()
-            setting_val = CanvasTextBox(f"{parsed_val}", 30, Colors.RED)
-            setting_val.global_position = Vector2(setting_key.rect.end.x + 20, line)
-            self.canvas.add_child(setting_val)
-            self.settings_dict[setting] = setting_val
-            line += 60
-        save_button = CanvasButton("Save settings?", self.save_settings, 30, Colors.GREEN)
-        bottom_right = Vector2(self.canvas.window.width - 193, self.canvas.window.height - 213)
+        canvas_line = 0
+        with open(self.conf_path, "r") as conf_file:
+            for line in conf_file:
+                line = line.strip("\n")
+                setting, setting_val = line.split("=")
+                key_label = CanvasText(f"{setting} = ", 30, Colors.RED)
+                key_label.global_position = Vector2(20, canvas_line)
+                self.canvas.add_child(key_label)
+                key_label._draw()
+                val_box = CanvasTextBox(f"{setting_val}", 30, Colors.RED)
+                val_box.global_position = Vector2(
+                    key_label.rect.end.x + 20, canvas_line
+                    )
+                self.canvas.add_child(val_box)
+                self.settings_dict[setting] = val_box
+                canvas_line += 60
+        save_button = CanvasButton(
+            "Save settings?", self.save_settings, 30, Colors.GREEN)
+        bottom_right = Vector2(
+            self.canvas.window.width - 193,
+            self.canvas.window.height - 213)
         save_button.global_position = bottom_right
         self.canvas.add_child(save_button)
         self.canvas.render_canvas()
- 
