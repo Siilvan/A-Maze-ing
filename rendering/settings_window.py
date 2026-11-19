@@ -1,4 +1,4 @@
-from maze_generator import MazeConfig
+from maze_generator import MazeConfig, Logger
 from . import Canvas
 from .elements import CanvasText, CanvasTextBox, CanvasButton
 from .colors import Colors
@@ -16,15 +16,28 @@ class SettingsWindow():
         self.settings_dict: dict[str, CanvasTextBox] = {}
 
     def save_settings(self) -> None:
-        new_settings: list[str] = []
+        new_lines: list[str] = []
         for key, val_box in self.settings_dict.items():
             line = ""
             line = key.upper() + "=" + val_box.text
-            new_settings.append(line)
-        file_content = "\n".join(new_settings)
+            new_lines.append(line)
+        with open(self.conf_path, "r") as curr_conf:
+            old_settings = curr_conf.read()
+        new_settings = "\n".join(new_lines)
         with open(self.conf_path, "w") as file:
-            file.write(file_content)
-
+            file.write(new_settings)
+        try:
+            temp_conf = MazeConfig().from_file(self.conf_path)
+        except MazeConfig.ParseError as e:
+            Logger.get().e(f"{e.msg}")
+            new_settings = old_settings
+        except Exception as e:
+            Logger.get().e(f"{e}")
+            new_settings = old_settings
+        with open(self.conf_path, "w") as final:
+            final.write(new_settings)
+        self.conf = temp_conf
+    
     def draw_settings(self) -> None:
         canvas_line = 0
         with open(self.conf_path, "r") as conf_file:

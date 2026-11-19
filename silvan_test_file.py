@@ -1,9 +1,9 @@
 # IF YOUR NOT SILVAN PLEASE DONT TOUCH THIS FILE
 from pathlib import Path
 
-from maze_generator import MazeConfig, Logger
+from maze_generator import MazeConfig, Logger, RowByRowMazeGenerator
 from rendering.canvas import Canvas, Colors, Vector2, MlxWindow
-from rendering import SettingsWindow
+from rendering import SettingsWindow, MazeWindow
 
 def load_conf(conf_path: str) -> MazeConfig | None:
     """
@@ -31,15 +31,20 @@ def main() -> None:
     if (conf is None):
         Logger.get().e("Failed to load configuration.")
         return
-    window: MlxWindow = MlxWindow()
-    window.init_window((2560, 1440), Colors.DARK_GRAY, "The a-Maze-ing Maze")
-    canvas: Canvas = Canvas(window)
-    settings = SettingsWindow(conf, canvas, conf_path)
-    settings.draw_settings()
-    # container: CanvasTextBox = CanvasTextBox(f"Hello", 24, Colors.FOREST_GREEN)
-    # container.global_position += Vector2(100, 100)
-    # canvas.add_child(container)
-    window.loop()
+    # window: MlxWindow = MlxWindow()
+    # window.init_window((2560, 1440), Colors.DARK_GRAY, "The a-Maze-ing Maze")
+    # canvas: Canvas = Canvas(window)
+    # settings = SettingsWindow(conf, canvas, conf_path)
+    # settings.draw_settings()
+
+    generator = RowByRowMazeGenerator(conf)
+    generator.generate_maze()
+    grid = generator.get_maze()
+
+    # canvas.clear_canvas()
+    maze_render = MazeWindow(grid)
+    maze_render.draw_maze()
+    # window.loop()
 
 
 if __name__ == "__main__":
