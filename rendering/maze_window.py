@@ -3,7 +3,9 @@ import random
 import time
 
 from logger import Logger
+from rendering.canvas import CanvasElement, Rect
 from rendering.image import MlxImage
+from rendering.vector import Vector2
 from rendering.window import MlxWindow
 
 
@@ -13,17 +15,22 @@ CELL_SCALE = 3
 IMG_DIR = Path(__file__).resolve().parent / "./static/images/"
 N, E, S, W = 1, 2, 4, 8
 
-class MazeWindow:
+class CanvasMaze(CanvasElement):
     def __init__(self, grid: list[list[int]], cell_size: int = CELL_SIZE, cell_scale: int = CELL_SCALE) -> None:
         self.grid = grid
-        self.window: MlxWindow = MlxWindow()
         self.cell_size: tuple[int, int] = (round(cell_size * cell_scale),
                                            round(cell_size * cell_scale))
-        self.window.init_window((self.cell_size[0] * len(grid), self.cell_size[1] * len(grid[0])))
         self.image_cache: dict[int, MlxImage] = {}
-        pass
+        super().__init__()
 
-    def draw_maze(self) -> None:
+    def get_rect(self) -> Rect:
+        self.rect = Rect(
+                Vector2(self.cell_size[1] * len(self.grid),
+                        self.cell_size[0] * len(self.grid[0])),
+                self.global_position)
+        return (self.rect)
+
+    def _draw(self) -> None:
         """
         Draws the maze on screen, cell by cell
         """
@@ -34,10 +41,11 @@ class MazeWindow:
                 cell_image: MlxImage | None = self._get_cell_image(self.grid[y][x])
                 if (cell_image is None):
                     return logger.e(f"Cell image for cell at pos {x, y} is None!")
-                self.window.put_image(cell_image, x * self.cell_size[0], y * self.cell_size[1])
+                cell_pos: Vector2 = Vector2(x * self.cell_size[0],
+                                            y * self.cell_size[1]) + self.global_position
+                self.window.put_image(cell_image, cell_pos.x, cell_pos.y)
         end = time.perf_counter()
         logger.i(f"Done! time taken: {end - s:.3}s")
-        self.window.loop()
 
     def _get_cell_image(self, cell: int) -> MlxImage | None:
         """

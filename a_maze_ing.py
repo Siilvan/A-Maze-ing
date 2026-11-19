@@ -8,6 +8,7 @@ from rendering.canvas import Canvas
 from rendering.colors import Colors
 from rendering.elements.hbox_container import CanvasHBoxContainer
 from rendering.elements.text import CanvasText
+from rendering.maze_window import CanvasMaze
 from rendering.vector import Vector2
 from rendering.window import MlxWindow
 
@@ -27,12 +28,6 @@ def load_conf(conf_path: str) -> MazeConfig | None:
         Logger.get().e(f"Parse error on line ({e.line_n}): {e.msg}\n{e.line[:-1]} << HERE")
     return None
 
-
-def main_loop(delta: float, c: Canvas) -> None:
-    c.clear_canvas()
-    c.tick()
-    c.render_canvas()
-
 def main() -> None:
     conf: MazeConfig | None = load_conf("maze.conf")
     if (conf is None):
@@ -43,19 +38,14 @@ def main() -> None:
         generator.generate_maze()
     except errors.ManualExit as e:
         print(f"{e} hw")
-    # grid : list[list[int]] = generator.get_maze()
-    # window: MazeWindow = MazeWindow(maze)
-    # window.draw_maze()
+    grid : list[list[int]] = generator.get_maze()
     window: MlxWindow = MlxWindow()
-    window.init_window((1920, 1080), Colors.DARK_GRAY, "Hello")
-    canvas: Canvas = Canvas(window, main_loop)
-    container: CanvasHBoxContainer = CanvasHBoxContainer(60, 24)
-    container.global_position += Vector2(100, 100)
-    canvas.add_child(container)
-    for i in range(10):
-        label: CanvasText = CanvasText(f"H{i}lo", 24, Colors.FOREST_GREEN)
-        container.add_child(label)
-    i = 0
+    window.init_window((1920, 1080), Colors.DARK_GRAY, "A-Maze-Ing!")
+    canvas: Canvas = Canvas(window)
+    maze: CanvasMaze = CanvasMaze(grid)
+    maze.global_position += Vector2(100, 100)
+    canvas.add_child(maze)
+    canvas.render_canvas()
     window.loop()
 
 
