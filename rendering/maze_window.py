@@ -25,8 +25,8 @@ class CanvasMaze(CanvasElement):
 
     def get_rect(self) -> Rect:
         self.rect = Rect(
-                Vector2(self.cell_size[1] * len(self.grid),
-                        self.cell_size[0] * len(self.grid[0])),
+                Vector2(self.cell_size[0] * len(self.grid),
+                        self.cell_size[1] * len(self.grid[0])),
                 self.global_position)
         return (self.rect)
 
@@ -44,6 +44,7 @@ class CanvasMaze(CanvasElement):
                 cell_pos: Vector2 = Vector2(x * self.cell_size[0],
                                             y * self.cell_size[1]) + self.global_position
                 self.window.put_image(cell_image, cell_pos.x, cell_pos.y)
+        self.get_rect()
         end = time.perf_counter()
         logger.i(f"Done! time taken: {end - s:.3}s")
 
@@ -57,7 +58,7 @@ class CanvasMaze(CanvasElement):
         #
         # if (cell in self.image_cache):
         #     return self.image_cache[cell]
-        logger.i(f"{cell} not cached, creating new image")
+        # logger.i(f"{cell} not cached, creating new image")
         path: str = self._get_cell_image_path(cell)
         img: MlxImage | None = MlxImage.from_image(self.window.mlx, self.window.mptr, path, scale=CELL_SCALE)
         if (img is None):

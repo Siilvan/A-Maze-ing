@@ -124,7 +124,7 @@ class CanvasElement(ABC):
         and draw the item instead, as this (in most cases)
         does all the steps of drawing the item, but just doesn't.
         """
-        pass
+        ...
 
     def on_mouse_press(self, button: int, pos: Vector2) -> None:
         self._on_mouse_press(button, pos)
@@ -157,20 +157,20 @@ class CanvasElement(ABC):
         """
         On key press
         """
-        pass
+        return
 
     def _on_mouse_press(self, button: int, pos: Vector2) -> None:
         """
         Handles mouse presses with `button` being the button, and `pos`
         the position of the cursor
         """
-        pass
+        return
 
     def _initialize(self) -> None:
         """
         _initialize method gets called when the child element is added as a child
         """
-        pass
+        return
 
     def _draw(self) -> None:
         """
@@ -183,7 +183,7 @@ class CanvasElement(ABC):
         """
         Gets called every frame
         """
-        pass
+        return
 
     def add_child(self, child: "CanvasElement"):
         """
@@ -224,13 +224,13 @@ class Canvas:
         self.window.hook_key_press(self._catch_key_press)
 
     def process_loop(self, _p: None):
-        self.render_canvas()
-        self.clear_canvas()
-        now = time.perf_counter()
-        if (self.main is not None):
-            self.main(now - self.delta, self)
+        # self.render_canvas()
+        # self.clear_canvas()
+        # now = time.perf_counter()
+        # if (self.main is not None):
+        #     self.main(now - self.delta, self)
         self.tick()
-        self.delta = now
+        # self.delta = now
 
     def tick(self) -> None:
         for c in self.children:

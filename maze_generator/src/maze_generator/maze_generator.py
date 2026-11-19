@@ -1,5 +1,9 @@
 import random
-from typing import override
+from typing import Generator, override
+
+from maze_generator.utils import solution_to_directions
+
+from .helpers import Logger
 from .config import MazeConfig
 from .logo import Logos
 from abc import ABC, abstractmethod
@@ -15,14 +19,14 @@ class MazeGenerator(ABC):
     Wall bits: 1 = north, 2 = east, 4 = south, 8 = west.
     A cell of 15 means walls on all sides.
     """
+
     def __init__(self, conf: MazeConfig):
         """Sets up the size, a grid full of walls (15), and the logo mask."""
+        self.config = conf
         self.width = conf.width
         self.height = conf.height
-        self.grid: list[list[int]] = [
-            [15 for _ in range(self.width)]
-            for _ in range(self.height)]
         self.perfect = conf.perfect
+        self.generated: bool = False
         self.blocked = Logos(conf.logo.strip("\n"), conf).MakeLogo()
 
     def get_maze(self) -> list[list[int]]:
@@ -32,34 +36,37 @@ class MazeGenerator(ABC):
     def generate_maze(self) -> None:
         """Resets the grid, builds the maze
         and removes dead ends if perfect isnt true."""
-        self.grid = [
-            [15 for _ in range(self.width)]
-            for _ in range(self.height)]
+        self.grid = [[15 for _ in range(self.width)] for _ in range(self.height)]
         self.initial_grid()
         if not self.perfect:
             self.remove_dead_ends()
+        self.generated = True
 
     @abstractmethod
     def initial_grid(self) -> None:
-        """Every generator has to have this.
-        Should create a perfect maze (no loops)."""
+        """
+        Every generator has to have this.
+        Should create a perfect maze (no loops).
+        """
         pass
 
-    def edit_wall(self, r: int, c: int, pwr: int, remove: bool) -> None:
-        """Adds or removes one wall on a cell,
+    def edit_wall(self, row: int, col: int, pwr: int, remove: bool) -> None:
+        """
+        Adds or removes one wall on a cell,
         and the opposing wall on the neighbour cell.
-        Does nothing if the cell is part of the logo."""
+        Does nothing if the cell is part of the logo.
+        """
         nbr = pow(2, pwr)
-        row_dir = r + (pwr % 2 == 0) * (pwr - 1)
-        cell_dir = c + (pwr % 2) * (2 - pwr)
+        row_dir = row + (pwr % 2 == 0) * (pwr - 1)
+        cell_dir = col + (pwr % 2) * (2 - pwr)
         opposite = (1 << ((pwr + 2) % 4))
-        if self.is_blocked(r, c):
+        if self.is_blocked(row, col):
             return
         if remove:
-            self.grid[r][c] &= ~nbr
+            self.grid[row][col] &= ~nbr
             self.grid[row_dir][cell_dir] &= ~opposite
         else:
-            self.grid[r][c] |= nbr
+            self.grid[row][col] |= nbr
             self.grid[row_dir][cell_dir] |= opposite
 
     def get_allowed_walls(self, r_idx: int, c_idx: int, cell: int) -> int:
@@ -160,6 +167,53 @@ class MazeGenerator(ABC):
             return self.blocked[y][x]
         return False
 
+    def grid_iterate(self) -> Generator[tuple[int, int, int]]:
+        """
+        Returns a generator that iterates over the grid, each item being:
+        tuple[int, int, int]
+        with (x, y, cell)
+        """
+        if (not self.generated):
+            Logger.get().w("Caution, iterating over the grid of an ungenerated maze")
+        for y in range(self.height):
+            for x in range(self.width):
+                yield (x, y, self.grid[y][x])
+
+    def write_grid_to_file(self) -> None:
+        logger = Logger.get()
+        if (not self.generated):
+            return logger.e("Cannot write to file, " +
+                            "the grid has not been generated yet!")
+        solution: list[tuple[int, int]] | None = self.get_solution()
+        if (solution is None):
+            return logger.e("Cannot write to file, " +
+                            "Failed to solve the maze!")
+        string_solution: str | None = solution_to_directions(solution)
+        if (string_solution is None):
+            return logger.e("Cannot write to file, " +
+                            "Failed to parse solution!")
+        with open(self.config.output_path, "w") as f:
+            for x, y, cell in self.grid_iterate():
+                f.write(hex(cell)[2:])
+                if (x == self.width - 1):
+                    f.write("\n")
+            f.write(f"""
+{self.config.entry_pos[0]}, {self.config.entry_pos[1]}
+{self.config.exit_pos[0]}, {self.config.exit_pos[1]}
+{string_solution}
+""")
+        Logger.get().i(f"Successfully wrote maze to file: {self.config.output_path}")
+
+    def get_solution(self) -> list[tuple[int, int]] | None:
+        """
+        Returns the solution of this maze. returns the path as a list of 
+        tuples each representing the coordinates of the cells.
+        None on failure.
+        """
+        from .solver import SolverBot
+        if (not self.generated):
+            Logger.get().w("Caution, trying to solve an ungenerated maze.")
+        return SolverBot(self.grid, self.config).solve(True)
 
 class RowByRowMazeGenerator(MazeGenerator):
     """

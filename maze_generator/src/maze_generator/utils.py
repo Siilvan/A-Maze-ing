@@ -1,3 +1,4 @@
+from .helpers import Logger
 from typing import Any
 
 def parse_position_tuple(
@@ -41,3 +42,31 @@ def try_parse[T](val: Any, to_type: type[T]) -> Any:
     if (to_type is bool):
         return parse_bool(val)
     return None
+
+def solution_to_directions(solution: list[tuple[int, int]]) -> str | None:
+    """
+    Returns a string of cardinal directions from
+    the list[tuple[int, int]] returned by the solver.
+    """
+    string: str = ""
+    previous: tuple[int, int] | None = None
+    for c in solution:
+        if (previous is None):
+            previous = c
+            continue
+        direction: tuple[int, int] = (c[0] - previous[0],
+                                      c[1] - previous[1])
+        match direction:
+            case (1, 0):
+                string += "N"
+            case (-1, 0):
+                string += "S"
+            case (0, 1):
+                string += "E"
+            case (0, -1):
+                string += "W"
+            case _:
+                Logger.get().e(f"Got unknown direction while parsing solution: {direction}")
+                return 
+        previous = c
+    return string

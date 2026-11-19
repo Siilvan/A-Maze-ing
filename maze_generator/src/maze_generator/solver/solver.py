@@ -43,13 +43,13 @@ class SolverBot():
         there's no way from entry to exit.
         """
         if fast:
-            result = self.fast_solve()
+            result = self._fast_solve()
         else:
-            self.slow_solve()
+            self._slow_solve()
             result = min(self.paths, key=len) if self.paths else None
         return result
 
-    def fast_solve(self) -> list[tuple[int, int]] | None:
+    def _fast_solve(self) -> list[tuple[int, int]] | None:
         """
         Solves the maze with a breadth-first search.
 
@@ -84,7 +84,7 @@ class SolverBot():
                 parent_cell[neighbour] = curr_cell
         return None
 
-    def slow_solve(self) -> None:
+    def _slow_solve(self) -> None:
         """
         Solves the maze by exploring corridors in parallel with a process pool.
 
