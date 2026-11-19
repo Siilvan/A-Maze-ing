@@ -33,13 +33,21 @@ class MlxWindow:
         self.bg = bg
         self._setup(bg)
 
-    def hook_mouse_press(self, func: Callable[[int, int, int, None], None]) -> None:
+    def hook_mouse_press(self, func: Callable) -> None:
         """
         Hooks the provided function to the mouse press event
         the callback should match the following signature:
         callback(button: int, x: int, y: int)
         """
         self.mlx.mlx_mouse_hook(self.wptr, func, None)
+
+    def hook_key_press(self, func: Callable) -> None:
+        """
+        Hooks the provided function to the key press event
+        the callback should match the following signature:
+        callback(button: int, x: int, y: int)
+        """
+        self.mlx.mlx_key_hook(self.wptr, func, None)
 
     def hook_loop(self, func: Callable, param: Any = None) -> None:
         """

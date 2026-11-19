@@ -4,7 +4,6 @@ from .config import MazeConfig
 from .logo import Logos
 from abc import ABC, abstractmethod
 
-
 class MazeGenerator(ABC):
     """
     Base class for the maze generators.

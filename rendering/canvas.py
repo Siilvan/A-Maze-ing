@@ -46,11 +46,22 @@ class CanvasElement(ABC):
     def __init__(self) -> None:
         self._initialized: bool = False
         self.parent: CanvasElement | None = None
+        self.dirty: bool = True
         # Position on screen
-        self.global_position: Vector2 = Vector2(0, 0)
+        self._global_position: Vector2 = Vector2(0, 0)
         self.rect: Rect = Rect.empty()
         self.children: list[CanvasElement] = []
         super().__init__()
+
+    @property
+    def global_position(self) -> Vector2:
+        return self._global_position
+
+    @global_position.setter
+    def global_position(self, a: Vector2) -> None:
+        if (a != self._global_position):
+            self.dirty = True
+        self._global_position = a
 
     @property
     def position(self) -> Vector2:
@@ -81,7 +92,9 @@ class CanvasElement(ABC):
         """
         if (not self._initialized):
             return Logger.get().e("Cannot draw an uninitialized element.")
-        self._draw()
+        if (self.dirty):
+            self._draw()
+            self.dirty = False
         if (debug):
             self.draw_rect()
 
@@ -104,10 +117,24 @@ class CanvasElement(ABC):
         for c in self.children:
             c.tick()
 
+    @abstractmethod
+    def get_rect(self) -> Rect:
+        """
+        Returns the rect of that item. If possible, try to avoid using this method
+        and draw the item instead, as this (in most cases)
+        does all the steps of drawing the item, but just doesn't.
+        """
+        pass
+
     def on_mouse_press(self, button: int, pos: Vector2) -> None:
         self._on_mouse_press(button, pos)
         for c in self.children:
             c.on_mouse_press(button, pos)
+
+    def on_key_press(self, button: int) -> None:
+        self._on_key_press(button)
+        for c in self.children:
+            c.on_key_press(button)
 
     def draw_rect(self) -> None:
         """
@@ -125,6 +152,12 @@ class CanvasElement(ABC):
                     image.set_pixel(x, y, Colors.BLACK)
         self.window.put_image(image, self.global_position.x, self.global_position.y)
         image.destroy(self.window.mlx, self.window.mptr)
+
+    def _on_key_press(self, button: int) -> None:
+        """
+        On key press
+        """
+        pass
 
     def _on_mouse_press(self, button: int, pos: Vector2) -> None:
         """
@@ -181,24 +214,35 @@ class Canvas:
         BOT_LEFT = (0, 1)
         BOT_RIGHT = (1, 1)
 
-    def __init__(self, window: MlxWindow) -> None:
+    def __init__(self, window: MlxWindow, main: Callable | None = None) -> None:
         self.window = window
-        self.delta: float = 0
+        self.main = main
         self.children: list[CanvasElement] = []
-        self.window.hook_mouse_press(self.catch_mouse_press)
-        # self.window.hook_loop(self.process_loop, None)
+        self.delta: float = 0
+        self.window.hook_mouse_press(self._catch_mouse_press)
+        self.window.hook_loop(self.process_loop, None)
+        self.window.hook_key_press(self._catch_key_press)
 
-    # def process_loop(self, _p: None):
-    #     self.clear_canvas()
-    #     self.render_canvas()
+    def process_loop(self, _p: None):
+        self.render_canvas()
+        self.clear_canvas()
+        now = time.perf_counter()
+        if (self.main is not None):
+            self.main(now - self.delta, self)
+        self.tick()
+        self.delta = now
 
     def tick(self) -> None:
         for c in self.children:
             c.tick()
 
-    def catch_mouse_press(self, button: int, x: int, y: int, _p : None):
+    def _catch_mouse_press(self, button: int, x: int, y: int, _p : None):
         for c in self.children:
             c.on_mouse_press(button, Vector2(x, y))
+
+    def _catch_key_press(self, key: int, _p: None):
+        for c in self.children:
+            c.on_key_press(key)
 
     def get_mouse_pos(self) -> Vector2:
         pos: tuple[int, int, int] = self.window.mlx.mlx_mouse_get_pos(self.window.mptr)
@@ -215,6 +259,3 @@ class Canvas:
     def render_canvas(self, debug: bool = False):
         for c in self.children:
             c.draw(debug)
-
-    def _on_mouse_press(self):
-        pass
