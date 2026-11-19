@@ -12,6 +12,7 @@ class SettingsWindow():
                  ) -> None:
         self.canvas = canvas
         self.conf_path = conf_path
+        self.conf = conf
         self.settings_dict: dict[str, CanvasTextBox] = {}
 
     def save_settings(self) -> None:

@@ -1,9 +1,10 @@
 from pathlib import Path
 import time
 
-from maze_generator import MazeConfig, RowByRowMazeGenerator, errors
-from solver import SolverBot
-from logger import Logger
+from maze_generator import (
+    MazeConfig, RowByRowMazeGenerator,
+    MazeSizeException, MazeGenerationException, ManualExit,
+    Logger, SolverBot)
 from rendering.canvas import Canvas
 from rendering import Colors, MazeWindow
 from rendering.elements.hbox_container import CanvasHBoxContainer
@@ -25,6 +26,12 @@ def load_conf(conf_path: str) -> MazeConfig | None:
         return MazeConfig.from_file(conf_path)
     except MazeConfig.ParseError as e:
         Logger.get().e(f"Parse error on line ({e.line_n}): {e.msg}\n{e.line[:-1]} << HERE")
+    except MazeSizeException as e:
+        Logger.get().e(f"{e}")
+    except MazeGenerationException as e:
+        Logger.get().e(f"{e}")
+    except ManualExit as e:
+        Logger.get().e(f"{e}")
     return None
 
 
@@ -39,10 +46,7 @@ def main() -> None:
         Logger.get().e("Failed to load configuration.")
         return
     generator = RowByRowMazeGenerator(conf)
-    try:
-        generator.generate_maze()
-    except errors.ManualExit as e:
-        print(f"{e} hw")
+    generator.generate_maze()
     grid : list[list[int]] = generator.get_maze()
     window: MazeWindow = MazeWindow(grid)
     window.draw_maze()

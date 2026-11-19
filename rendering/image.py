@@ -3,7 +3,7 @@ from pathlib import Path
 from mlx import Mlx
 from PIL import Image, ImageFont
 
-from logger import Logger
+from helpers.logger import Logger
 from rendering.colors import Color, Colors
 
 class MlxImage:

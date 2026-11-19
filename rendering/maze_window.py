@@ -2,7 +2,7 @@ from pathlib import Path
 import random
 import time
 
-from logger import Logger
+from helpers.logger import Logger
 from rendering.image import MlxImage
 from rendering.window import MlxWindow
 
@@ -19,7 +19,7 @@ class MazeWindow:
         self.window: MlxWindow = MlxWindow()
         self.cell_size: tuple[int, int] = (round(cell_size * cell_scale),
                                            round(cell_size * cell_scale))
-        self.window.init_window((self.cell_size[0] * len(grid), self.cell_size[1] * len(grid[0])))
+        self.window.init_window((self.cell_size[0] * len(grid[0]), self.cell_size[1] * len(grid)))
         self.image_cache: dict[int, MlxImage] = {}
         pass
 

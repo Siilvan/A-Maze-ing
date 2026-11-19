@@ -1,8 +1,6 @@
 from . import MazeConfig
-from maze_generator import errors
 from collections import deque
-from logger import Logger
-import sys
+from ..helpers import Logger
 
 CHARS: dict[str, list[str]] = {
     '0': ["##.", "#.#", "#.#", "#.#", ".##"],
@@ -76,24 +74,13 @@ class Logos():
         if not self.logo:
             return[[False for _ in range(self.width)] for _ in range(self.height)]
         for i, char in enumerate(self.logo):
-            glyph = self.GridNumbers(char.upper())
+            glyph = self.GridChars(char.upper())
             for r in range(glyph_rows):
                 if i > 0 and not char == ' ':
                     logo_grid[r].append(False)
                 logo_grid[r].extend(glyph[r])
 
         logo_width = len(logo_grid[0])
-        if self.width < logo_width + 2 or self.height < 7:
-            Logger.get().i(f"Maze too small: must be at least {logo_width + 2}"
-                           f" wide and 7 high.")
-            Logger.get().i("Continue printing maze without logo? (y/n) ", end="")
-            sys.stdout.flush()
-            y_n = sys.stdin.readline().strip()
-            if y_n.lower() == 'y':
-                return [[False for _ in range(self.width)]
-                        for _ in range(self.height)]
-            else:
-                raise errors.ManualExit("User exited the program - quitting.")
         start_r = (self.height - glyph_rows) // 2
         start_c = (self.width - logo_width) // 2
 
@@ -122,7 +109,7 @@ class Logos():
                 if not self.full_logo[r][c] and not seen[r][c]:
                     self.full_logo[r][c] = True
 
-    def GridNumbers(self, char: str) -> list[list[bool]]:
+    def GridChars(self, char: str) -> list[list[bool]]:
         if char not in CHARS:
             Logger.get().w(f"No Glyph for: {char}. Using space instead.")
             char = ' '

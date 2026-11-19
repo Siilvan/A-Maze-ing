@@ -1,5 +1,7 @@
 from typing import Any
 from .utils import *
+from ..helpers import MazeGenerationException, MazeSizeException, ManualExit, Logger
+import sys
 
 
 class MazeConfig:
@@ -38,6 +40,33 @@ class MazeConfig:
 
         returns True or False if the config is correct or not
         """
+        if self.width < 2 or self.height < 2:
+            raise MazeSizeException(
+                "Maze must be at least 2 wide and 2 high")
+        if (not 0 <= self.entry_pos[0] < self.height
+            or not 0 <= self.entry_pos[1] < self.width):
+            raise MazeGenerationException(
+                "Entry position outside of maze.")
+        if (not 0 <= self.exit_pos[0] < self.height
+            or not 0 <= self.exit_pos[1] < self.width):
+            raise MazeGenerationException(
+                "Exit position outside of maze")
+        logo_len = 0
+        for i in range(len(self.logo)):
+            logo_len += 3
+            if i < len(self.logo) - 1 and self.logo[i + 1] != " ":
+                logo_len += 1
+        if self.height < 7 or self.width < logo_len + 2:
+            Logger.get().w(f"Maze too small for logo: must be at least {logo_len + 2}"
+                           f" wide and 7 high.")
+            Logger.get().w("Continue printing maze without logo? (y/n) ", end="")
+            sys.stdout.flush()
+            y_n = sys.stdin.readline().strip()
+            if y_n.lower() == "y":
+                self.logo = ""
+            else: 
+                raise ManualExit("User exited program - quitting")
+
         return (False)
 
     @classmethod
@@ -67,6 +96,7 @@ class MazeConfig:
                             line=line
                             )
                 line = f.readline()
+        config.validate_config()
         return config
 
 

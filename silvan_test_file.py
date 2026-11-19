@@ -2,7 +2,7 @@
 from pathlib import Path
 
 from maze_generator import MazeConfig
-from logger import Logger
+from helpers.logger import Logger
 from rendering.canvas import Canvas, Colors, Vector2, MlxWindow
 from rendering import SettingsWindow
 
