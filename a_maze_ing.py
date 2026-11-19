@@ -6,7 +6,7 @@ from maze_generator import (
     MazeSizeException, MazeGenerationException, ManualExit,
     Logger, SolverBot)
 from rendering.canvas import Canvas
-from rendering import Colors, MazeWindow
+from rendering import Colors, CanvasMaze
 from rendering.elements.hbox_container import CanvasHBoxContainer
 from rendering.elements.text import CanvasText
 from rendering.maze_window import CanvasMaze
