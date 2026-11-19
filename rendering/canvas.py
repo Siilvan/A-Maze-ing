@@ -8,7 +8,7 @@ from typing import Callable
 
 from mlx import Mlx
 
-from helpers.logger import Logger
+from maze_generator import Logger
 from rendering.colors import Color, Colors
 from rendering.image import MlxImage
 from rendering.vector import Vector2

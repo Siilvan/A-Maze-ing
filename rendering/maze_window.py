@@ -2,7 +2,7 @@ from pathlib import Path
 import random
 import time
 
-from helpers.logger import Logger
+from maze_generator import Logger
 from rendering.image import MlxImage
 from rendering.window import MlxWindow
 

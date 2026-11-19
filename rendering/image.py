@@ -3,7 +3,7 @@ from pathlib import Path
 from mlx import Mlx
 from PIL import Image, ImageFont
 
-from helpers.logger import Logger
+from maze_generator import Logger
 from rendering.colors import Color, Colors
 
 class MlxImage:

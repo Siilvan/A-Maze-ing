@@ -4,7 +4,7 @@ from typing import override
 from typing import Callable
 from PIL import Image, ImageDraw, ImageFont
 
-from helpers.logger import Logger
+from maze_generator import Logger
 from rendering.canvas import CanvasElement, Rect
 from rendering.colors import Color, Colors
 from ..image import MlxImage

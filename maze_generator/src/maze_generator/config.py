@@ -1,6 +1,6 @@
 from typing import Any
 from .utils import *
-from ..helpers import MazeGenerationException, MazeSizeException, ManualExit, Logger
+from .helpers import MazeGenerationException, MazeSizeException, ManualExit, Logger
 import sys
 
 

@@ -1,8 +1,7 @@
 # IF YOUR NOT SILVAN PLEASE DONT TOUCH THIS FILE
 from pathlib import Path
 
-from maze_generator import MazeConfig
-from helpers.logger import Logger
+from maze_generator import MazeConfig, Logger
 from rendering.canvas import Canvas, Colors, Vector2, MlxWindow
 from rendering import SettingsWindow
 

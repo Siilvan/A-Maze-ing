@@ -1,6 +1,6 @@
-from . import MazeConfig
+from .config import MazeConfig
 from collections import deque
-from ..helpers import Logger
+from .helpers import Logger
 
 CHARS: dict[str, list[str]] = {
     '0': ["##.", "#.#", "#.#", "#.#", ".##"],

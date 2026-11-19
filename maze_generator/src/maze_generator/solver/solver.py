@@ -1,6 +1,6 @@
 import concurrent.futures
 from collections import deque
-from ..maze_generator import MazeConfig
+from ..config import MazeConfig
 
 DIRS: dict[int, tuple[str, int, int]] = {
     0: ("N", -1, 0),
