@@ -2,8 +2,8 @@ from pathlib import Path
 import random
 import time
 
-from logger import Logger
 from rendering.canvas import CanvasElement, Rect
+from maze_generator import Logger
 from rendering.image import MlxImage
 from rendering.vector import Vector2
 from rendering.window import MlxWindow

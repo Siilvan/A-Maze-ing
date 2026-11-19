@@ -2,7 +2,7 @@ from typing import Any, Callable
 
 from mlx import Mlx
 
-from logger import Logger
+from maze_generator import Logger
 from rendering.colors import Color, Colors
 from rendering.image import MlxImage
 

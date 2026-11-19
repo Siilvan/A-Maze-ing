@@ -1,6 +1,12 @@
 from .config import MazeConfig
 from .maze_generator import RowByRowMazeGenerator
-from .maze_generator import MazeGenerator
-from . import errors
+from .solver import SolverBot
+from .helpers import (
+    MazeGenerationException, MazeSizeException, ManualExit, CharNotFound, Logger
+)
 
-__all__ = ['MazeConfig', 'MazeGenerator', 'RowByRowMazeGenerator']
+__all__ = [
+    'MazeConfig', 'RowByRowMazeGenerator', 'SolverBot',
+    'MazeGenerationException', 'MazeSizeException', 'ManualExit',
+    'CharNotFound', 'Logger',
+]
