@@ -5,6 +5,7 @@ from maze_generator import (
     MazeConfig, RowByRowMazeGenerator,
     MazeSizeException, MazeGenerationException, ManualExit,
     Logger, SolverBot)
+from maze_generator.helpers import errors
 from rendering.canvas import Canvas
 from rendering import Colors
 from rendering.elements import CanvasText, CanvasMaze, CanvasSettings
@@ -44,14 +45,14 @@ def main() -> None:
     except ManualExit as e:
         Logger.get().e(f"{e}")
     grid : list[list[int]] = generator.get_maze()
+    generator.write_grid_to_file()
     window: MlxWindow = MlxWindow()
     window.init_window((1920, 1080), Colors.DARK_GRAY, "A-Maze-Ing!")
     canvas: Canvas = Canvas(window)
+    container: CanvasHBoxContainer = CanvasHBoxContainer()
     maze: CanvasMaze = CanvasMaze(grid)
-    maze.global_position += Vector2(100, 100)
-    print(maze.get_rect())
     canvas.add_child(maze)
-    canvas.render_canvas()
+    canvas.render_canvas(True)
     window.loop()
 
 

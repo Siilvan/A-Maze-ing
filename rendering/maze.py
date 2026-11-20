@@ -23,8 +23,13 @@ class CanvasMaze(CanvasElement):
 
     def get_rect(self) -> Rect:
         self.rect = Rect(
+<<<<<<< HEAD:rendering/maze.py
                 Vector2(self.cell_size[1] * len(self.grid[0]),
                         self.cell_size[0] * len(self.grid)),
+=======
+                Vector2(self.cell_size[0] * len(self.grid),
+                        self.cell_size[1] * len(self.grid[0])),
+>>>>>>> e6b19f7dfb70ea193d5f408cc399154635f7904c:rendering/maze_window.py
                 self.global_position)
         return (self.rect)
 
@@ -42,6 +47,7 @@ class CanvasMaze(CanvasElement):
                 cell_pos: Vector2 = Vector2(x * self.cell_size[0],
                                             y * self.cell_size[1]) + self.global_position
                 self.window.put_image(cell_image, cell_pos.x, cell_pos.y)
+        self.get_rect()
         end = time.perf_counter()
         self.get_rect()
         Logger.get().i(f"Done! time taken: {end - s:.3}s")

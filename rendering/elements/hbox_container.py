@@ -12,16 +12,12 @@ class CanvasHBoxContainer(CanvasElement):
         self.timer: float = time.perf_counter()
         super().__init__()
 
-    def _tick(self) -> None:
-        now = time.perf_counter()
-        print(time.perf_counter() - now)
-        self.timer = now
-
     @override
     def _on_mouse_press(self, button: int, pos: Vector2) -> None:
         if (self.rect.has_point(pos)):
             print(f"Pressed in me!")
 
+    @override
     def get_rect(self) -> Rect:
         width: int = self.padding
         height: int = self.padding
