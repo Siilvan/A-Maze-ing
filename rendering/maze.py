@@ -23,13 +23,8 @@ class CanvasMaze(CanvasElement):
 
     def get_rect(self) -> Rect:
         self.rect = Rect(
-<<<<<<< HEAD:rendering/maze.py
                 Vector2(self.cell_size[1] * len(self.grid[0]),
                         self.cell_size[0] * len(self.grid)),
-=======
-                Vector2(self.cell_size[0] * len(self.grid),
-                        self.cell_size[1] * len(self.grid[0])),
->>>>>>> e6b19f7dfb70ea193d5f408cc399154635f7904c:rendering/maze_window.py
                 self.global_position)
         return (self.rect)
 
