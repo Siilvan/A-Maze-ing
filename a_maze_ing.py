@@ -5,6 +5,7 @@ from maze_generator import (
     MazeConfig, RowByRowMazeGenerator,
     MazeSizeException, MazeGenerationException, ManualExit,
     Logger, SolverBot)
+from maze_generator.dfs_generator import DFSMazeGenerator
 from maze_generator.helpers import errors
 from rendering.canvas import Canvas
 from rendering import Colors, CanvasMaze
@@ -41,7 +42,7 @@ def main() -> None:
     if (conf is None):
         Logger.get().e("Failed to load configuration.")
         return
-    generator = RowByRowMazeGenerator(conf)
+    generator = DFSMazeGenerator(conf)
     try:
         generator.generate_maze()
     except errors.ManualExit as e:

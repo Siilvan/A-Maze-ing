@@ -1,12 +1,14 @@
 import random
 from typing import Generator, override
 
-from maze_generator.utils import solution_to_directions
+from maze_generator.utils import solution_to_directions, tuple_op
 
 from .helpers import Logger
 from .config import MazeConfig
 from .logo import Logos
 from abc import ABC, abstractmethod
+
+N, E, S, W = 1, 2, 4, 8
 
 class MazeGenerator(ABC):
     """
@@ -28,6 +30,32 @@ class MazeGenerator(ABC):
         self.perfect = conf.perfect
         self.generated: bool = False
         self.blocked = Logos(conf.logo.strip("\n"), conf).MakeLogo()
+        print(self.blocked)
+
+    def remove_wall_between(self, cell_a: tuple[int, int], cell_b: tuple[int, int]) -> None:
+        """
+        Removes the wall between two cells.
+
+        For some reason east and west is inverted ?
+        """
+        c_a: int = self._get_cell_at(cell_a)
+        c_b: int = self._get_cell_at(cell_b)
+        direction: tuple[int, int] = tuple_op(cell_a, cell_b, lambda a, b: a - b)
+        print(direction)
+        match direction:
+            case (0, 1):
+                self._set_cell_at(cell_a, c_a & ~N)
+                self._set_cell_at(cell_b, c_b & ~S)
+            case (1, 0):
+                self._set_cell_at(cell_a, c_a & ~W)
+                self._set_cell_at(cell_b, c_b & ~E)
+            case (0, -1):
+                self._set_cell_at(cell_a, c_a & ~S)
+                self._set_cell_at(cell_b, c_b & ~N)
+            case (-1, 0):
+                self._set_cell_at(cell_a, c_a & ~E)
+                self._set_cell_at(cell_b, c_b & ~W)
+
 
     def get_maze(self) -> list[list[int]]:
         """Gives back the grid."""
@@ -80,31 +108,45 @@ class MazeGenerator(ABC):
         if cnt == 3:
             allow = 15
             if r_idx == 0:
-                allow &= ~1
+                allow &= ~N
             if c_idx == self.width - 1:
-                allow &= ~2
+                allow &= ~E
             if r_idx == self.height - 1:
-                allow &= ~4
+                allow &= ~S
             if c_idx == 0:
-                allow &= ~8
+                allow &= ~W
             if self.is_blocked(r_idx - 1, c_idx):
-                allow &= ~1
+                allow &= ~N
             if self.is_blocked(r_idx, c_idx + 1):
-                allow &= ~2
+                allow &= ~E
             if self.is_blocked(r_idx + 1, c_idx):
-                allow &= ~4
+                allow &= ~S
             if self.is_blocked(r_idx, c_idx - 1):
-                allow &= ~8
+                allow &= ~W
         else:
             allow = 0
         return (allow)
+    
+    def _get_cell_at(self, pos: tuple[int, int]) -> int:
+        """
+        Returns the cell at the provided position.
+        raises index error if there is no cell
+        """
+        return self.grid[pos[1]][pos[0]]
+
+    def _set_cell_at(self, pos: tuple[int, int], cell: int) -> None:
+        """
+        Sets the cell at the provided position.
+        raises index error if there is no cell
+        """
+        self.grid[pos[1]][pos[0]] = cell
 
     def get_set_bits(self, nbr: int) -> list[int]:
         """Returns the positions of the 1 bits, e.g. 10 (0b1010) -> [1, 3]."""
         positions = []
         position = 0
         while nbr > 0:
-            if nbr & 1:
+            if nbr & N:
                 positions.append(position)
             nbr >>= 1
             position += 1
@@ -118,11 +160,11 @@ class MazeGenerator(ABC):
             return False
         for rr in range(r, r + 3):
             for cc in range(c, c + 2):
-                if self.grid[rr][cc] & 2:
+                if self.grid[rr][cc] & E:
                     return False
-        for rr in range(r, r + 2):
+        for rr in range(r, r + E):
             for cc in range(c, c + 3):
-                if self.grid[rr][cc] & 4:
+                if self.grid[rr][cc] & S:
                     return False
         return True
 
@@ -315,8 +357,8 @@ class RowByRowMazeGenerator(MazeGenerator):
                     if (x > 0 and self.new_sets[x - 1] != s_id and
                        not self.is_blocked(y, x - 1)):
                         neighbour_set = self.new_sets[x - 1]
-                        row[x - 1] &= ~2
-                        row[x] &= ~8
+                        row[x - 1] &= ~E
+                        row[x] &= ~W
                         self.merge_sets(s_id, neighbour_set)
                         fixed = True
                         break
@@ -324,8 +366,8 @@ class RowByRowMazeGenerator(MazeGenerator):
                           and self.new_sets[x + 1] != s_id
                           and not self.is_blocked(y, x + 1)):
                         neighbour_set = self.new_sets[x + 1]
-                        row[x + 1] &= ~8
-                        row[x] &= ~2
+                        row[x + 1] &= ~W
+                        row[x] &= ~E
                         self.merge_sets(s_id, neighbour_set)
                         fixed = True
                         break
@@ -341,7 +383,7 @@ class RowByRowMazeGenerator(MazeGenerator):
         Also builds the members lookup."""
         self.members: dict[int, list[int]] = {}
         for x in range(self.width):
-            if row_above and (row_above[x] & 4) == 0:
+            if row_above and (row_above[x] & S) == 0:
                 s_id = self.sets[x]
             else:
                 s_id = self.next_id
@@ -386,7 +428,7 @@ class RowByRowMazeGenerator(MazeGenerator):
                 if (cell == forced
                    or dead_pocket_below
                    or random.random() < 0.4):
-                    row[cell] &= ~4
+                    row[cell] &= ~S
 
     def h_corridors(
             self, row: list[int], y: int,
@@ -399,10 +441,10 @@ class RowByRowMazeGenerator(MazeGenerator):
             if (self.new_sets[x] != self.new_sets[x + 1] and
                random.random() < merge_chance and
                not self.is_blocked(y, x) and not self.is_blocked(y, x + 1)):
-                row[x] &= ~2
-                row[x + 1] &= ~8
+                row[x] &= ~E
+                row[x + 1] &= ~W
                 self.merge_sets(self.new_sets[x], self.new_sets[x + 1])
 
         for x in range(self.width):
-            if row_above and (row_above[x] & 4) == 0:
-                row[x] &= ~1
+            if row_above and (row_above[x] & S) == 0:
+                row[x] &= ~N
