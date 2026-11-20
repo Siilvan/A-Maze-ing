@@ -1,11 +1,11 @@
-class MazeSizeException(Exception):
+class MazeSizeException(BaseException):
     pass
 
-class MazeGenerationException(Exception):
+class MazeGenerationException(BaseException):
     pass
 
-class CharNotFound(Exception):
+class CharNotFound(BaseException):
     pass
 
-class ManualExit(Exception):
+class ManualExit(BaseException):
     pass

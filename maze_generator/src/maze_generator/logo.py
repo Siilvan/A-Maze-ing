@@ -69,7 +69,7 @@ class Logos():
                     [False for _ in range(self.width)]
                     for _ in range(self.height)]
 
-    def MakeLogo(self) -> list[list[bool]]:
+    def make_logo(self) -> list[list[bool]]:
         glyph_rows = 5
         logo_grid: list[list[bool]] = [[] for _ in range(glyph_rows)]
         if not self.logo:
@@ -87,16 +87,18 @@ class Logos():
             logo_len += 3
             if i < len(self.logo) - 1 and self.logo[i + 1] != " ":
                 logo_len += 1
-            if self.height < 7 or self.width < logo_len + 2:
-                Logger.get().w(f"Maze too small for logo: must be at least {logo_len + 2}"
-                               f" wide and 7 high.")
-                Logger.get().w("Continue printing maze without logo? (y/n) ", end="")
-                sys.stdout.flush()
-                y_n = sys.stdin.readline().strip()
-                if y_n.lower() == "y":
-                    self.logo = ""
-                else: 
-                    raise ManualExit("User exited program - quitting")
+        if self.height < 7 or self.width < logo_len + 2:
+            Logger.get().w(f"Maze too small for logo: must be at least {logo_len + 2}"
+                           f" wide and 7 high.")
+            Logger.get().w("Continue printing maze without logo? (y/n) ", end="")
+            sys.stdout.flush()
+            y_n = sys.stdin.readline().strip()
+            if y_n.lower() == "y":
+                return [
+                    [False for _ in range(self.width)]
+                    for _ in range(self.height)]
+            else: 
+                raise ManualExit("User exited program - quitting")
         start_r = (self.height - glyph_rows) // 2
         start_c = (self.width - logo_width) // 2
 

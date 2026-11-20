@@ -6,10 +6,8 @@ from maze_generator import (
     MazeSizeException, MazeGenerationException, ManualExit,
     Logger, SolverBot)
 from rendering.canvas import Canvas
-from rendering import Colors, CanvasMaze
-from rendering.elements.hbox_container import CanvasHBoxContainer
-from rendering.elements.text import CanvasText
-from rendering.maze_window import CanvasMaze
+from rendering import Colors
+from rendering.elements import CanvasText, CanvasMaze, CanvasSettings
 from rendering.vector import Vector2
 from rendering.window import MlxWindow
 
@@ -41,13 +39,17 @@ def main() -> None:
         Logger.get().e("Failed to load configuration.")
         return
     generator = RowByRowMazeGenerator(conf)
-    generator.generate_maze()
+    try:
+        generator.generate_maze()
+    except ManualExit as e:
+        Logger.get().e(f"{e}")
     grid : list[list[int]] = generator.get_maze()
     window: MlxWindow = MlxWindow()
     window.init_window((1920, 1080), Colors.DARK_GRAY, "A-Maze-Ing!")
     canvas: Canvas = Canvas(window)
     maze: CanvasMaze = CanvasMaze(grid)
     maze.global_position += Vector2(100, 100)
+    print(maze.get_rect())
     canvas.add_child(maze)
     canvas.render_canvas()
     window.loop()

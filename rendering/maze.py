@@ -8,9 +8,9 @@ from rendering.image import MlxImage
 from rendering.vector import Vector2
 from rendering.window import MlxWindow
 
-CELL_SIZE = 16
-CELL_SCALE = 3
-IMG_DIR = Path(__file__).resolve().parent / "./static/images/"
+CELL_SIZE = 70
+CELL_SCALE = 1
+IMG_DIR = Path(__file__).resolve().parent / "./static/images/forest"
 N, E, S, W = 1, 2, 4, 8
 
 class CanvasMaze(CanvasElement):
@@ -23,8 +23,8 @@ class CanvasMaze(CanvasElement):
 
     def get_rect(self) -> Rect:
         self.rect = Rect(
-                Vector2(self.cell_size[1] * len(self.grid),
-                        self.cell_size[0] * len(self.grid[0])),
+                Vector2(self.cell_size[1] * len(self.grid[0]),
+                        self.cell_size[0] * len(self.grid)),
                 self.global_position)
         return (self.rect)
 
@@ -43,6 +43,7 @@ class CanvasMaze(CanvasElement):
                                             y * self.cell_size[1]) + self.global_position
                 self.window.put_image(cell_image, cell_pos.x, cell_pos.y)
         end = time.perf_counter()
+        self.get_rect()
         Logger.get().i(f"Done! time taken: {end - s:.3}s")
 
     def _get_cell_image(self, cell: int) -> MlxImage | None:
@@ -55,7 +56,7 @@ class CanvasMaze(CanvasElement):
         #
         # if (cell in self.image_cache):
         #     return self.image_cache[cell]
-        Logger.get().i(f"{cell} not cached, creating new image")
+        # Logger.get().i(f"{cell} not cached, creating new image")
         path: str = self._get_cell_image_path(cell)
         img: MlxImage | None = MlxImage.from_image(self.window.mlx, self.window.mptr, path, scale=CELL_SCALE)
         if (img is None):
@@ -70,7 +71,8 @@ class CanvasMaze(CanvasElement):
         if (cell == 0):
             return str(IMG_DIR / "empty.png")
         if (cell == N + E + S + W):
-            return str(IMG_DIR / f"full_{random.randint(1, 6)}.png")
+            return str(IMG_DIR / f"north_east_south_west_1.png")
+            # return str(IMG_DIR / f"full_{random.randint(1, 6)}.png")
         path: list[str] = []
         if (cell & N):
             path.append("north")
@@ -80,7 +82,7 @@ class CanvasMaze(CanvasElement):
             path.append("south")
         if (cell & W):
             path.append("west")
-        return str(IMG_DIR / f"{'_'.join(path)}.png")
+        return str(IMG_DIR / f"{'_'.join(path)}_{random.randint(1, 7)}.png")
 
 if __name__ == "__main__":
     Logger.get().w("You're running the wrong file dawg")

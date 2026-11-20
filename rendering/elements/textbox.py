@@ -32,7 +32,7 @@ class CanvasTextBox(CanvasElement):
 
     @override
     def _draw(self) -> None:
-        image: MlxImage | None = self.get_string_image(self.text)
+        image: MlxImage | None = self._get_string_image(f"'{self.text}'")
         if (image is None):
             logger.e(f"Failed to generate image for string '{self.text}'")
             return
@@ -40,7 +40,15 @@ class CanvasTextBox(CanvasElement):
         self.window.put_image(image, self.global_position.x, self.global_position.y)
         return super()._draw()
 
-    def get_string_image(self, string: str) -> MlxImage | None:
+    def get_rect(self) -> Rect:
+        image: MlxImage | None = self._get_string_image(self.text)
+        if (image is None):
+            logger.e(f"Failed to generate image for string '{self.text}'")
+            raise RuntimeError
+        self.rect = Rect(Vector2(image.width, image.height), self.global_position)
+        return self.rect
+        
+    def _get_string_image(self, string: str) -> MlxImage | None:
         font: ImageFont.FreeTypeFont = ImageFont.truetype(CanvasText.FONT_DIR /
                                                           "Roboto-Regular.ttf", self.font_size)
         ascent, descent = font.getmetrics()
