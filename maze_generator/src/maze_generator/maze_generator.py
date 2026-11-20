@@ -27,7 +27,7 @@ class MazeGenerator(ABC):
         self.height = conf.height
         self.perfect = conf.perfect
         self.generated: bool = False
-        self.blocked = Logos(conf.logo.strip("\n"), conf).MakeLogo()
+        self.blocked = Logos(conf.logo.strip("\n"), conf).make_logo()
 
     def get_maze(self) -> list[list[int]]:
         """Gives back the grid."""
