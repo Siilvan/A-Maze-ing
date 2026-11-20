@@ -36,11 +36,12 @@ def main() -> None:
     if (conf is None):
         Logger.get().e("Failed to load configuration.")
         return
-    generator = RowByRowMazeGenerator(conf)
     try:
+        generator = RowByRowMazeGenerator(conf)
         generator.generate_maze()
     except ManualExit as e:
         Logger.get().e(f"{e}")
+        return
     grid : list[list[int]] = generator.get_maze()
     window: MlxWindow = MlxWindow()
     window.init_window((2560, 1440), Colors.DARK_GRAY, "A-Maze-Ing!")

@@ -8,7 +8,7 @@ from typing import Callable
 
 from mlx import Mlx
 
-from maze_generator import Logger
+from maze_generator import Logger, ManualExit
 from rendering.colors import Color, Colors
 from rendering.image import MlxImage
 from rendering.vector import Vector2
@@ -248,6 +248,12 @@ class Canvas:
         self.window.hook_mouse_press(self._catch_mouse_press)
         self.window.hook_loop(self.process_loop, None)
         self.window.hook_key_press(self._catch_key_press)
+        self.window.mlx.mlx_hook(
+            self.window.wptr,
+            33,
+            131072,
+            lambda param: self.close_window(param),
+            self.window.mptr)
 
     def process_loop(self, _p: None):
         self.clear_canvas()
@@ -263,12 +269,21 @@ class Canvas:
             c.tick()
 
     def _catch_mouse_press(self, button: int, x: int, y: int, _p : None):
-        for c in self.children:
-            c.on_mouse_press(button, Vector2(x, y))
+        try:
+            for c in self.children:
+                c.on_mouse_press(button, Vector2(x, y))
+        except ManualExit as e:
+            Logger.get().e(f"{e}")
+            self.close_window(self.window.mptr)
 
     def _catch_key_press(self, key: int, _p: None):
         for c in self.children:
             c.on_key_press(key)
+
+    def close_window(self, mptr: int) -> None:
+        self.window.mlx.mlx_loop_exit(mptr)
+        Logger.get().i("Window got closed successfully!")
+        return 0
 
     def get_mouse_pos(self) -> Vector2:
         pos: tuple[int, int, int] = self.window.mlx.mlx_mouse_get_pos(self.window.mptr)

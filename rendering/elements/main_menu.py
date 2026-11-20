@@ -31,11 +31,7 @@ class CanvasMainMenu(CanvasElement):
 
     def regenerate(self):
         new_gen = RowByRowMazeGenerator(self.conf)
-        try:
-            print("AAAAAAAAAAAAAAAAAAAAA")
-            new_gen.generate_maze()
-        except ManualExit as e:
-            print(f"{e}")
+        new_gen.generate_maze()
         new_grid = new_gen.get_maze()
         self.curr_maze.dirty = True
         self.curr_maze.grid = new_grid

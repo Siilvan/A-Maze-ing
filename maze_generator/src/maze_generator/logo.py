@@ -97,7 +97,7 @@ class Logos():
                 return [
                     [False for _ in range(self.width)]
                     for _ in range(self.height)]
-            else: 
+            else:
                 raise ManualExit("User exited program - quitting")
         start_r = (self.height - glyph_rows) // 2
         start_c = (self.width - logo_width) // 2
