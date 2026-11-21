@@ -51,7 +51,7 @@ def main() -> None:
     canvas.add_child(container)
 
     maze: CanvasMaze = CanvasMaze(grid)
-    menu = CanvasMainMenu(conf, maze)
+    menu = CanvasMainMenu(conf, conf_path, maze)
     container.add_child(maze)
     container.add_child(menu)
     # settings = CanvasSettings(conf, conf_path)

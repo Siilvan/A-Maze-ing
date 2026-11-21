@@ -85,5 +85,9 @@ class CanvasMaze(CanvasElement):
             path.append("west")
         return str(IMG_DIR / f"{'_'.join(path)}_{random.randint(1, 7)}.png")
 
+    def set_new_grid(self, grid: list[list[int]]) -> None:
+        self.dirty = True
+        self.grid = grid
+
 if __name__ == "__main__":
     Logger.get().w("You're running the wrong file dawg")

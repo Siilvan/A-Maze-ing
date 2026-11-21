@@ -60,8 +60,6 @@ class CanvasElement(ABC):
     @dirty.setter
     def dirty(self, value: bool) -> None:
         self._dirty = value
-        # if value and self.parent is not None:
-        #     self.parent.dirty = True
 
     @property
     def global_position(self) -> Vector2:
@@ -97,6 +95,11 @@ class CanvasElement(ABC):
         self.window = window
         self._initialized = True
         self._initialize()
+
+    def dirty_tree(self) -> None:
+        self.dirty = True
+        for c in self.children:
+            c.dirty_tree()
 
     def draw(self, debug: bool = False) -> None:
         """
@@ -219,6 +222,7 @@ class CanvasElement(ABC):
         self.children.append(child)
         child.parent = self
         child.initialize(self.window)
+        self._pre_draw()
 
     def remove_child(self, child: "CanvasElement"):
         """

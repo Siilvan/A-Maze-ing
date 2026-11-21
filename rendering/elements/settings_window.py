@@ -22,6 +22,12 @@ class CanvasSettings(CanvasElement):
         self.vbox = CanvasBoxContainer(10, 0, True)
 
     def get_rect(self) -> Rect:
+        # !!!!! IF SETTINGS WINDOW IS NOT CLEARING PROPERLY UNCOMMENT THE LINES BELOW
+        # AND COMMENT THE OTHER RETURN, I DONt KNOW WHY THIS WORKS AND IT DOESNT MATTER
+        # WE'LL JUST HAVE TO BE FINE WITH THE CLEARING WHEN OYU FIRST OPEN THE SETTINGS
+
+        # self.rect =  self.vbox.get_rect()
+        # return self.rect
         return self.vbox.get_rect()
 
     def _draw(self) -> None:
@@ -40,8 +46,7 @@ class CanvasSettings(CanvasElement):
         with open(self.conf_path, "w") as file:
             file.write(new_settings)
         try:
-            temp_conf = MazeConfig().from_file(self.conf_path)
-            self.conf = temp_conf
+            MazeConfig().from_file(self.conf_path)
         except MazeConfig.ParseError as e:
             Logger.get().e(f"{e.msg}")
             new_settings = old_settings
@@ -50,6 +55,8 @@ class CanvasSettings(CanvasElement):
             new_settings = old_settings
         with open(self.conf_path, "w") as final:
             final.write(new_settings)
+        self.rect = self.get_rect()
+        self.parent.remove_child(self)
 
     def _initialize(self) -> None:
         self.add_child(self.vbox)
