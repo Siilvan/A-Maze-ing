@@ -50,7 +50,7 @@ def main() -> None:
     if (conf is None):
         Logger.get().e("Failed to load configuration.")
         return
-    generator = RowByRowMazeGenerator(conf)
+    generator = DFSMazeGenerator(conf)
     try:
         generator.generate_maze()
     except ManualExit as e:

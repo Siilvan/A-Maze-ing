@@ -9,12 +9,12 @@ from rendering.vector import Vector2
 from rendering.window import MlxWindow
 
 CELL_SIZE = 50
-CELL_SCALE = 2
+CELL_SCALE = 1.5
 IMG_DIR = Path(__file__).resolve().parent / "./static/images/forest"
 N, E, S, W = 1, 2, 4, 8
 
 class CanvasMaze(CanvasElement):
-    def __init__(self, grid: list[list[int]], cell_size: int = CELL_SIZE, cell_scale: int = CELL_SCALE) -> None:
+    def __init__(self, grid: list[list[int]], cell_size: int = CELL_SIZE, cell_scale: float = CELL_SCALE) -> None:
         self.grid = grid
         self.cell_size: tuple[int, int] = (round(cell_size * cell_scale),
                                            round(cell_size * cell_scale))
