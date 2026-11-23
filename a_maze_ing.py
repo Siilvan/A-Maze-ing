@@ -22,12 +22,16 @@ def load_conf(conf_path: str) -> MazeConfig | None:
     """
     p = Path(conf_path)
     if not p.exists():
-        Logger.get().w("Specified config path does not exist, using default values instead.")
+        Logger.get().w(
+            "Specified config path does not exist, using default values instead."
+        )
         return MazeConfig()
     try:
         return MazeConfig.from_file(conf_path)
     except MazeConfig.ParseError as e:
-        Logger.get().e(f"Parse error on line ({e.line_n}): {e.msg}\n{e.line[:-1]} << HERE")
+        Logger.get().e(
+            f"Parse error: {e.msg}\n\n\t{e.line_n}: {e.line[:-1]} << HERE\n"
+        )
     except MazeSizeException as e:
         Logger.get().e(f"{e}")
     except MazeGenerationException as e:
