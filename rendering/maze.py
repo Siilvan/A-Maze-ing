@@ -8,8 +8,8 @@ from rendering.image import MlxImage
 from rendering.vector import Vector2
 from rendering.window import MlxWindow
 
-CELL_SIZE = 70
-CELL_SCALE = 1
+CELL_SIZE = 50
+CELL_SCALE = 2
 IMG_DIR = Path(__file__).resolve().parent / "./static/images/forest"
 N, E, S, W = 1, 2, 4, 8
 
@@ -36,7 +36,7 @@ class CanvasMaze(CanvasElement):
         Logger.get().i("Drawing maze...")
         for y in range(len(self.grid)):
             for x in range(len(self.grid[y])):
-                cell_image: MlxImage | None = self._get_cell_image(self.grid[y][x])
+                cell_image: MlxImage | None = self._get_cell_image(self.grid[y][x], Vector2(x, y))
                 if (cell_image is None):
                     return Logger.get().e(f"Cell image for cell at pos {x, y} is None!")
                 cell_pos: Vector2 = Vector2(x * self.cell_size[0],
@@ -47,7 +47,7 @@ class CanvasMaze(CanvasElement):
         self.get_rect()
         Logger.get().i(f"Done! time taken: {end - s:.3}s")
 
-    def _get_cell_image(self, cell: int) -> MlxImage | None:
+    def _get_cell_image(self, cell: int, cell_pos: Vector2) -> MlxImage | None:
         """
         Creates a new image of a cell, returns the image pointer on success,
         None on failure
@@ -58,31 +58,34 @@ class CanvasMaze(CanvasElement):
         # if (cell in self.image_cache):
         #     return self.image_cache[cell]
         # Logger.get().i(f"{cell} not cached, creating new image")
-        path: str = self._get_cell_image_path(cell)
+        path: str = self._get_cell_image_path(cell, cell_pos)
         img: MlxImage | None = MlxImage.from_image(self.window.mlx, self.window.mptr, path, scale=CELL_SCALE)
         if (img is None):
             return Logger.get().e("Failed to generate cell image.")
         self.image_cache[cell] = img
         return (img)
 
-    def _get_cell_image_path(self, cell: int) -> str:
+    def _get_cell_image_path(self, cell: int, cell_pos: Vector2) -> str:
         """
         Returns the image path appropriate for the cell `cell`
         """
         if (cell == 0):
             return str(IMG_DIR / "empty.png")
-        if (cell == N + E + S + W):
-            return str(IMG_DIR / f"north_east_south_west_1.png")
+        # if (cell == N + E + S + W):
+        #     return str(IMG_DIR / f"north_east_south_west_1.png")
             # return str(IMG_DIR / f"full_{random.randint(1, 6)}.png")
         path: list[str] = []
         if (cell & N):
             path.append("north")
-        if (cell & E):
+        if (cell & E and cell_pos.x == len(self.grid[0]) - 1):
             path.append("east")
-        if (cell & S):
+        if (cell & S and cell_pos.y == len(self.grid) - 1):
             path.append("south")
         if (cell & W):
             path.append("west")
+        if (len(path) == 0):
+            return str(IMG_DIR / "empty.png")
+        
         return str(IMG_DIR / f"{'_'.join(path)}_{random.randint(1, 7)}.png")
 
 if __name__ == "__main__":
