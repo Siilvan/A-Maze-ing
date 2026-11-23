@@ -9,7 +9,7 @@ from maze_generator.dfs_generator import DFSMazeGenerator
 from maze_generator.helpers import errors
 from rendering.canvas import Canvas
 from rendering import Colors
-from rendering.elements import CanvasText, CanvasMaze, CanvasSettings
+from rendering.elements import CanvasText, CanvasMaze, CanvasSettings, CanvasBoxContainer
 from rendering.vector import Vector2
 from rendering.window import MlxWindow
 
@@ -50,7 +50,7 @@ def main() -> None:
     window: MlxWindow = MlxWindow()
     window.init_window((1920, 1080), Colors.DARK_GRAY, "A-Maze-Ing!")
     canvas: Canvas = Canvas(window)
-    container: CanvasHBoxContainer = CanvasHBoxContainer()
+    container: CanvasBoxContainer = CanvasBoxContainer()
     maze: CanvasMaze = CanvasMaze(grid)
     canvas.add_child(maze)
     canvas.render_canvas(True)
