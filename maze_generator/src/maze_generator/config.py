@@ -66,15 +66,10 @@ class MazeConfig:
             line_n : int = 1
             line: str = f.readline().strip()
             while (line != ""):
-                tokens = line.split("=")
-                if (len(tokens) != 2):
+                key, val = config._parse_line(line, line_n)
+                if (not config._assign_key(key, val)):
                     raise MazeConfig.ParseError(
-                            msg="Unparseable line",
-                            line_n=line_n,
-                            line=line)
-                if (not config._assign_key(tokens[0], tokens[1])):
-                    raise MazeConfig.ParseError(
-                            msg=f"Failed to assign {tokens[1]} to {tokens[0]}, " +
+                            msg=f"Failed to assign \033[32m\"{val}\"\033[0m to \033[33m{key}\033[0m, " +
                             "ensure the type and naming are correct.",
                             line_n=line_n,
                             line=line
@@ -82,6 +77,26 @@ class MazeConfig:
                 line = f.readline()
         config.validate_config()
         return config
+
+    def _parse_line(self, line: str, line_n: int) -> tuple[str, str]:
+        """
+        Parses a config line, returns a tuple containing (key, val)
+        """
+        eq_pos: int = line.find("=")
+        if (eq_pos == -1):
+            raise MazeConfig.ParseError(
+                    msg="Unparseable line",
+                    line_n=line_n,
+                    line=line)
+        key: str = line[:eq_pos]
+        comment_pos: int = line.find("#")
+        val: str = ""
+        if (comment_pos < 0):
+            val = line[eq_pos + 1:]
+        else:
+            val = line[eq_pos + 1:comment_pos]
+        return (key, val)
+
 
 
     def _assign_key(self, key: str, val: Any) -> bool:
