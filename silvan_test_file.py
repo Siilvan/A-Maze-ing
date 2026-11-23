@@ -1,9 +1,14 @@
-# IF YOUR NOT SILVAN PLEASE DONT TOUCH THIS FILE
 from pathlib import Path
+import time
 
-from maze_generator import MazeConfig, Logger
-from rendering.canvas import Canvas, Colors, Vector2, MlxWindow
-from rendering import SettingsWindow
+from maze_generator import (
+    MazeConfig, RowByRowMazeGenerator,
+    MazeSizeException, MazeGenerationException, ManualExit,
+    Logger, SolverBot)
+from rendering import (
+    Canvas, Colors, CanvasMaze, CanvasSettings, MlxWindow,
+    CanvasBoxContainer, Vector2, CanvasText, CanvasMainMenu
+)
 
 def load_conf(conf_path: str) -> MazeConfig | None:
     """
@@ -19,11 +24,11 @@ def load_conf(conf_path: str) -> MazeConfig | None:
         return MazeConfig.from_file(conf_path)
     except MazeConfig.ParseError as e:
         Logger.get().e(f"Parse error on line ({e.line_n}): {e.msg}\n{e.line[:-1]} << HERE")
+    except MazeSizeException as e:
+        Logger.get().e(f"{e}")
+    except MazeGenerationException as e:
+        Logger.get().e(f"{e}")
     return None
-
-
-def main_loop() -> None:
-    print("F")
 
 def main() -> None:
     conf_path = "maze.conf"
@@ -31,14 +36,29 @@ def main() -> None:
     if (conf is None):
         Logger.get().e("Failed to load configuration.")
         return
+    try:
+        generator = RowByRowMazeGenerator(conf)
+        generator.generate_maze()
+    except ManualExit as e:
+        Logger.get().e(f"{e}")
+        return
+    grid : list[list[int]] = generator.get_maze()
     window: MlxWindow = MlxWindow()
-    window.init_window((2560, 1440), Colors.DARK_GRAY, "The a-Maze-ing Maze")
+    window.init_window((2560, 1440), Colors.DARK_GRAY, "A-Maze-Ing!")
     canvas: Canvas = Canvas(window)
-    settings = SettingsWindow(conf, canvas, conf_path)
-    settings.draw_settings()
-    # container: CanvasTextBox = CanvasTextBox(f"Hello", 24, Colors.FOREST_GREEN)
-    # container.global_position += Vector2(100, 100)
-    # canvas.add_child(container)
+
+    container = CanvasBoxContainer(10, 100)
+    canvas.add_child(container)
+
+    maze: CanvasMaze = CanvasMaze(grid)
+    menu = CanvasMainMenu(conf, maze)
+    container.add_child(maze)
+    container.add_child(menu)
+    # settings = CanvasSettings(conf, conf_path)
+    # container.add_child(settings)
+
+
+    canvas.render_canvas()
     window.loop()
 
 

@@ -8,11 +8,9 @@ from rendering.image import MlxImage
 from rendering.vector import Vector2
 from rendering.window import MlxWindow
 
-
-logger = Logger.get()
-CELL_SIZE = 16
-CELL_SCALE = 3
-IMG_DIR = Path(__file__).resolve().parent / "./static/images/"
+CELL_SIZE = 70
+CELL_SCALE = 1
+IMG_DIR = Path(__file__).resolve().parent / "./static/images/forest"
 N, E, S, W = 1, 2, 4, 8
 
 class CanvasMaze(CanvasElement):
@@ -25,8 +23,8 @@ class CanvasMaze(CanvasElement):
 
     def get_rect(self) -> Rect:
         self.rect = Rect(
-                Vector2(self.cell_size[0] * len(self.grid),
-                        self.cell_size[1] * len(self.grid[0])),
+                Vector2(self.cell_size[1] * len(self.grid[0]),
+                        self.cell_size[0] * len(self.grid)),
                 self.global_position)
         return (self.rect)
 
@@ -35,18 +33,19 @@ class CanvasMaze(CanvasElement):
         Draws the maze on screen, cell by cell
         """
         s = time.perf_counter()
-        logger.i("Drawing maze...")
+        Logger.get().i("Drawing maze...")
         for y in range(len(self.grid)):
             for x in range(len(self.grid[y])):
                 cell_image: MlxImage | None = self._get_cell_image(self.grid[y][x])
                 if (cell_image is None):
-                    return logger.e(f"Cell image for cell at pos {x, y} is None!")
+                    return Logger.get().e(f"Cell image for cell at pos {x, y} is None!")
                 cell_pos: Vector2 = Vector2(x * self.cell_size[0],
                                             y * self.cell_size[1]) + self.global_position
                 self.window.put_image(cell_image, cell_pos.x, cell_pos.y)
         self.get_rect()
         end = time.perf_counter()
-        logger.i(f"Done! time taken: {end - s:.3}s")
+        self.get_rect()
+        Logger.get().i(f"Done! time taken: {end - s:.3}s")
 
     def _get_cell_image(self, cell: int) -> MlxImage | None:
         """
@@ -58,11 +57,11 @@ class CanvasMaze(CanvasElement):
         #
         # if (cell in self.image_cache):
         #     return self.image_cache[cell]
-        # logger.i(f"{cell} not cached, creating new image")
+        # Logger.get().i(f"{cell} not cached, creating new image")
         path: str = self._get_cell_image_path(cell)
         img: MlxImage | None = MlxImage.from_image(self.window.mlx, self.window.mptr, path, scale=CELL_SCALE)
         if (img is None):
-            return logger.e("Failed to generate cell image.")
+            return Logger.get().e("Failed to generate cell image.")
         self.image_cache[cell] = img
         return (img)
 
@@ -73,7 +72,8 @@ class CanvasMaze(CanvasElement):
         if (cell == 0):
             return str(IMG_DIR / "empty.png")
         if (cell == N + E + S + W):
-            return str(IMG_DIR / f"full_{random.randint(1, 6)}.png")
+            return str(IMG_DIR / f"north_east_south_west_1.png")
+            # return str(IMG_DIR / f"full_{random.randint(1, 6)}.png")
         path: list[str] = []
         if (cell & N):
             path.append("north")
@@ -83,7 +83,7 @@ class CanvasMaze(CanvasElement):
             path.append("south")
         if (cell & W):
             path.append("west")
-        return str(IMG_DIR / f"{'_'.join(path)}.png")
+        return str(IMG_DIR / f"{'_'.join(path)}_{random.randint(1, 7)}.png")
 
 if __name__ == "__main__":
-    logger.w("You're running the wrong file dawg")
+    Logger.get().w("You're running the wrong file dawg")

@@ -29,7 +29,8 @@ class MazeGenerator(ABC):
         self.height = conf.height
         self.perfect = conf.perfect
         self.generated: bool = False
-        self.blocked = Logos(conf.logo.strip("\n"), conf).MakeLogo()
+        logo = Logos(conf.logo.strip("\n"), conf)
+        self.blocked = logo.make_logo()
         print(self.blocked)
 
     def remove_wall_between(self, cell_a: tuple[int, int], cell_b: tuple[int, int]) -> None:
@@ -55,7 +56,6 @@ class MazeGenerator(ABC):
             case (-1, 0):
                 self._set_cell_at(cell_a, c_a & ~E)
                 self._set_cell_at(cell_b, c_b & ~W)
-
 
     def get_maze(self) -> list[list[int]]:
         """Gives back the grid."""

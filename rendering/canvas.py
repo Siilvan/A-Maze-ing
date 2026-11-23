@@ -8,7 +8,7 @@ from typing import Callable
 
 from mlx import Mlx
 
-from maze_generator import Logger
+from maze_generator import Logger, ManualExit
 from rendering.colors import Color, Colors
 from rendering.image import MlxImage
 from rendering.vector import Vector2
@@ -46,12 +46,22 @@ class CanvasElement(ABC):
     def __init__(self) -> None:
         self._initialized: bool = False
         self.parent: CanvasElement | None = None
-        self.dirty: bool = True
+        self._dirty: bool = True
         # Position on screen
         self._global_position: Vector2 = Vector2(0, 0)
         self.rect: Rect = Rect.empty()
         self.children: list[CanvasElement] = []
         super().__init__()
+
+    @property
+    def dirty(self) -> bool:
+        return self._dirty
+
+    @dirty.setter
+    def dirty(self, value: bool) -> None:
+        self._dirty = value
+        # if value and self.parent is not None:
+        #     self.parent.dirty = True
 
     @property
     def global_position(self) -> Vector2:
@@ -60,8 +70,11 @@ class CanvasElement(ABC):
     @global_position.setter
     def global_position(self, a: Vector2) -> None:
         if (a != self._global_position):
+            delta = a - self._global_position
+            self._global_position = a
             self.dirty = True
-        self._global_position = a
+            for c in self.children:
+                c.global_position = c.global_position + delta
 
     @property
     def position(self) -> Vector2:
@@ -93,14 +106,22 @@ class CanvasElement(ABC):
         if (not self._initialized):
             return Logger.get().e("Cannot draw an uninitialized element.")
         if (self.dirty):
+            self._pre_draw()
             self._draw()
             self.dirty = False
+        for c in self.children:
+            c.draw()
         if (debug):
             self.draw_rect()
 
     def clear(self) -> None:
         if (self.rect.size == Vector2(0, 0)):
             return
+        for c in self.children:
+            c.clear()
+        if not self.dirty:
+            return
+        Logger.get().i(f"clearing {type(self).__name__}")
         image: MlxImage = MlxImage.new_image(self.window.mlx,
                                              self.window.mptr,
                                              self.rect.size.x,
@@ -172,6 +193,9 @@ class CanvasElement(ABC):
         """
         return
 
+    def _pre_draw(self) -> None:
+        pass
+
     def _draw(self) -> None:
         """
         Renders this object on screen
@@ -201,6 +225,8 @@ class CanvasElement(ABC):
         Removes a child to this canvas element
         """
         self.children.remove(child)
+        child.dirty = True
+        child.clear()
         child.parent = None
 
     def is_hovering(self, mouse_pos: Vector2) -> bool:
@@ -222,14 +248,20 @@ class Canvas:
         self.window.hook_mouse_press(self._catch_mouse_press)
         self.window.hook_loop(self.process_loop, None)
         self.window.hook_key_press(self._catch_key_press)
+        self.window.mlx.mlx_hook(
+            self.window.wptr,
+            33,
+            131072,
+            lambda param: self.close_window(param),
+            self.window.mptr)
 
     def process_loop(self, _p: None):
-        # self.render_canvas()
-        # self.clear_canvas()
+        self.clear_canvas()
+        self.render_canvas()
         # now = time.perf_counter()
         # if (self.main is not None):
         #     self.main(now - self.delta, self)
-        self.tick()
+        # self.tick()
         # self.delta = now
 
     def tick(self) -> None:
@@ -237,12 +269,21 @@ class Canvas:
             c.tick()
 
     def _catch_mouse_press(self, button: int, x: int, y: int, _p : None):
-        for c in self.children:
-            c.on_mouse_press(button, Vector2(x, y))
+        try:
+            for c in self.children:
+                c.on_mouse_press(button, Vector2(x, y))
+        except ManualExit as e:
+            Logger.get().e(f"{e}")
+            self.close_window(self.window.mptr)
 
     def _catch_key_press(self, key: int, _p: None):
         for c in self.children:
             c.on_key_press(key)
+
+    def close_window(self, mptr: int) -> None:
+        self.window.mlx.mlx_loop_exit(mptr)
+        Logger.get().i("Window got closed successfully!")
+        return 0
 
     def get_mouse_pos(self) -> Vector2:
         pos: tuple[int, int, int] = self.window.mlx.mlx_mouse_get_pos(self.window.mptr)

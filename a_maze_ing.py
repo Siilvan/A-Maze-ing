@@ -8,10 +8,8 @@ from maze_generator import (
 from maze_generator.dfs_generator import DFSMazeGenerator
 from maze_generator.helpers import errors
 from rendering.canvas import Canvas
-from rendering import Colors, CanvasMaze
-from rendering.elements.hbox_container import CanvasHBoxContainer
-from rendering.elements.text import CanvasText
-from rendering.maze_window import CanvasMaze
+from rendering import Colors
+from rendering.elements import CanvasText, CanvasMaze, CanvasSettings
 from rendering.vector import Vector2
 from rendering.window import MlxWindow
 
@@ -45,8 +43,8 @@ def main() -> None:
     generator = DFSMazeGenerator(conf)
     try:
         generator.generate_maze()
-    except errors.ManualExit as e:
-        print(f"{e} Manual exit.")
+    except ManualExit as e:
+        Logger.get().e(f"{e}")
     grid : list[list[int]] = generator.get_maze()
     generator.write_grid_to_file()
     window: MlxWindow = MlxWindow()
