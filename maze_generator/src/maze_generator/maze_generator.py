@@ -62,6 +62,9 @@ class MazeGenerator(ABC):
     def generate_maze(self) -> None:
         """Resets the grid, builds the maze
         and removes dead ends if perfect isnt true."""
+        seed: int = self.config.get_seed()
+        Logger.get().i(f"Generating maze with seed: {seed}")
+        random.seed(seed)
         self.grid = [[15 for _ in range(self.width)] for _ in range(self.height)]
         self.initial_grid()
         if not self.perfect:

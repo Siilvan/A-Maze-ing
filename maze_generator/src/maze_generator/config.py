@@ -1,3 +1,4 @@
+import random
 from typing import Any
 from .utils import *
 from .helpers import MazeGenerationException, MazeSizeException
@@ -18,8 +19,22 @@ class MazeConfig:
                  perfect: bool = False,
                  width: int = 50,
                  height: int = 50,
-                 logo:str = "42"
+                 logo:str = "42",
+                 seed: int | None = None
                  ) -> None:
+        # Dictionary of the expected type for each attribute
+        # used for parsing
+        self.expected_types: dict[str, type] = {
+                "exit_pos": tuple,
+                "entry_pos": tuple,
+                "output_pvaiath": str,
+                "perfect": bool,
+                "width": int,
+                "height": int,
+                "logo": str,
+                "seed": int
+                }
+        self.seed: int | None = seed
         self.width: int = width
         self.height: int = height
         self.entry_pos: tuple[int, int] = entry_pos
@@ -31,6 +46,15 @@ class MazeConfig:
         self.output_path: str = output_path
         self.perfect: bool = perfect
         self.logo: str = logo
+
+    def get_seed(self) -> int:
+        """
+        Returns the config seed of the maze if it exists,
+        a random seed otherwise
+        """
+        if (self.seed is None):
+            return random.getrandbits(8 * 4)
+        return self.seed
 
     def validate_config(self) -> bool:
         """
@@ -120,7 +144,7 @@ class MazeConfig:
         key = key.lower()
         # Ensure that this object has an attribute with the keyname
         if (hasattr(self, key)):
-            parsed: Any = try_parse(val, type(getattr(self, key)))
+            parsed: Any = try_parse(val, self.expected_types[key])
             if (parsed is None):
                 return False
             setattr(self, key, parsed)
