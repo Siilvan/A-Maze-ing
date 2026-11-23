@@ -31,7 +31,6 @@ class MazeGenerator(ABC):
         self.generated: bool = False
         logo = Logos(conf.logo.strip("\n"), conf)
         self.blocked = logo.make_logo()
-        print(self.blocked)
 
     def remove_wall_between(self, cell_a: tuple[int, int], cell_b: tuple[int, int]) -> None:
         """
@@ -42,7 +41,6 @@ class MazeGenerator(ABC):
         c_a: int = self._get_cell_at(cell_a)
         c_b: int = self._get_cell_at(cell_b)
         direction: tuple[int, int] = tuple_op(cell_a, cell_b, lambda a, b: a - b)
-        print(direction)
         match direction:
             case (0, 1):
                 self._set_cell_at(cell_a, c_a & ~N)

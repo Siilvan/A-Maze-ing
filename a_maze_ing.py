@@ -1,4 +1,5 @@
 from pathlib import Path
+import sys
 import time
 
 from maze_generator import (
@@ -21,7 +22,7 @@ def load_conf(conf_path: str) -> MazeConfig | None:
     """
     p = Path(conf_path)
     if not p.exists():
-        Logger.get().w("Specified config path does not exist, using default instead.")
+        Logger.get().w("Specified config path does not exist, using default values instead.")
         return MazeConfig()
     try:
         return MazeConfig.from_file(conf_path)
@@ -36,7 +37,12 @@ def load_conf(conf_path: str) -> MazeConfig | None:
     return None
 
 def main() -> None:
-    conf: MazeConfig | None = load_conf("maze.conf")
+    conf: MazeConfig | None = None
+    if (len(sys.argv) < 2):
+        Logger.get().w("No config specified, using default values instead.")
+        conf = MazeConfig()
+    else:
+        conf = load_conf(sys.argv[1])
     if (conf is None):
         Logger.get().e("Failed to load configuration.")
         return

@@ -27,7 +27,7 @@ class CanvasMainMenu(CanvasElement):
         super()._draw()
 
     def settings(self):
-        print("settings")
+        pass
 
     def regenerate(self):
         new_gen = RowByRowMazeGenerator(self.conf)
@@ -37,10 +37,10 @@ class CanvasMainMenu(CanvasElement):
         self.curr_maze.grid = new_grid
 
     def get_seed(self):
-        print("ew, i dont wanna give you my seed")
+        pass
 
     def bonus(self):
-        print("Super cool bonus that will definetly exist")
+        pass
 
     @override
     def _initialize(self) -> None:

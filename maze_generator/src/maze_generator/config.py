@@ -64,8 +64,12 @@ class MazeConfig:
         config: "MazeConfig" = cls()
         with open(path, "r") as f:
             line_n : int = 1
-            line: str = f.readline().strip()
+            line: str = f.readline()
             while (line != ""):
+                if (config._should_skip_line(line)):
+                    line = f.readline()
+                    line_n += 1
+                    continue
                 key, val = config._parse_line(line, line_n)
                 if (not config._assign_key(key, val)):
                     raise MazeConfig.ParseError(
@@ -75,13 +79,23 @@ class MazeConfig:
                             line=line
                             )
                 line = f.readline()
+                line_n += 1
         config.validate_config()
         return config
+
+    def _should_skip_line(self, line: str) -> bool:
+        """
+        Checks wether the provided line should be skipped:
+        (comment or empty line)
+        """
+        line = line.strip()
+        return (line.startswith("#") or line == "")
 
     def _parse_line(self, line: str, line_n: int) -> tuple[str, str]:
         """
         Parses a config line, returns a tuple containing (key, val)
         """
+        line = line.strip()
         eq_pos: int = line.find("=")
         if (eq_pos == -1):
             raise MazeConfig.ParseError(
@@ -96,8 +110,6 @@ class MazeConfig:
         else:
             val = line[eq_pos + 1:comment_pos]
         return (key, val)
-
-
 
     def _assign_key(self, key: str, val: Any) -> bool:
         """
