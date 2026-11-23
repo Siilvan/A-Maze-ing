@@ -2,9 +2,11 @@ from pathlib import Path
 import random
 import time
 
+from maze_generator.maze_generator import N, E, S, W
+
 from rendering import Colors
 from rendering.canvas import CanvasElement, Rect
-from maze_generator import Logger
+from maze_generator import Logger, MazeConfig
 from rendering.colors import Color
 from rendering.image import MlxImage
 from rendering.vector import Vector2
@@ -13,10 +15,19 @@ from rendering.window import MlxWindow
 CELL_SIZE = 50
 CELL_SCALE = 1.5
 IMG_DIR = Path(__file__).resolve().parent / "./static/images/forest"
-N, E, S, W = 1, 2, 4, 8
 
 class CanvasMaze(CanvasElement):
-    def __init__(self, grid: list[list[int]], cell_size: int = CELL_SIZE, cell_scale: float = CELL_SCALE) -> None:
+    def __init__(self, grid: list[list[int]],
+                 maze_config: MazeConfig,
+                 cell_size: int = CELL_SIZE,
+                 cell_scale: float = CELL_SCALE,
+                 maze_solution: list[tuple[int, int]] | None = None
+                 ) -> None:
+        if (maze_solution is not None):
+            self.maze_solution = [Vector2.from_tuple(s) for s in maze_solution]
+        else:
+            self.maze_solution = None
+        self.conf = maze_config
         self.grid = grid
         self.cell_size: tuple[int, int] = (round(cell_size * cell_scale),
                                            round(cell_size * cell_scale))
@@ -54,22 +65,25 @@ class CanvasMaze(CanvasElement):
         Creates a new image of a cell, returns the image pointer on success,
         None on failure
         """
-        # Caching doesn't work and I have no idea why
-        # Uncomment these lines to enable it
-        #
-        # if (cell in self.image_cache):
-        #     return self.image_cache[cell]
-        # Logger.get().i(f"{cell} not cached, creating new image")
         path: str = self._get_cell_image_path(cell, cell_pos)
         fill_color: Color = Colors.TRANSPARENT
-        if (cell == N + E + S + W):
-            fill_color = Colors.RED
+        fill_padding: int = 10
+        if (cell_pos == Vector2.from_tuple(self.conf.entry_pos)):
+            fill_color = Colors.CYAN
+            fill_padding = round(self.cell_size[0] / 2)
+        elif (cell_pos == Vector2.from_tuple(self.conf.exit_pos)):
+            fill_color = Colors.LIME
+            fill_padding = round(self.cell_size[0] / 2)
+        elif (self.maze_solution is not None):
+            if (cell_pos in self.maze_solution):
+                print(f"pos: {cell_pos}, cell: {cell}")
+                fill_color = Colors.RED
+                fill_padding = fill_padding = round(self.cell_size[0] / 1.7)
         img: MlxImage | None = MlxImage.from_image(self.window.mlx, self.window.mptr,
                                                    path, scale=CELL_SCALE, bg=fill_color,
-                                                   bg_padding=10)
+                                                   bg_padding=fill_padding)
         if (img is None):
             return Logger.get().e("Failed to generate cell image.")
-        self.image_cache[cell] = img
         return (img)
 
     def _get_cell_image_path(self, cell: int, cell_pos: Vector2) -> str:
@@ -78,15 +92,15 @@ class CanvasMaze(CanvasElement):
         """
         if (cell == 0):
             return str(IMG_DIR / "empty.png")
-        # if (cell == N + E + S + W):
-        #     return str(IMG_DIR / f"north_east_south_west_1.png")
-            # return str(IMG_DIR / f"full_{random.randint(1, 6)}.png")
+        if (cell == N + E + S + W):
+            return str(IMG_DIR / f"north_east_south_west_1.png")
+            return str(IMG_DIR / f"full_{random.randint(1, 6)}.png")
         path: list[str] = []
         if (cell & N):
             path.append("north")
-        if (cell & E and cell_pos.x == len(self.grid[0]) - 1):
+        if (cell & E):
             path.append("east")
-        if (cell & S and cell_pos.y == len(self.grid) - 1):
+        if (cell & S):
             path.append("south")
         if (cell & W):
             path.append("west")

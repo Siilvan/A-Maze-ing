@@ -50,7 +50,7 @@ def main() -> None:
     if (conf is None):
         Logger.get().e("Failed to load configuration.")
         return
-    generator = DFSMazeGenerator(conf)
+    generator = RowByRowMazeGenerator(conf)
     try:
         generator.generate_maze()
     except ManualExit as e:
@@ -61,7 +61,8 @@ def main() -> None:
     window.init_window((1920, 1080), Colors.DARK_GRAY, "A-Maze-Ing!")
     canvas: Canvas = Canvas(window)
     container: CanvasBoxContainer = CanvasBoxContainer()
-    maze: CanvasMaze = CanvasMaze(grid)
+    solution: list[tuple[int, int]] | None = generator.get_solution()
+    maze: CanvasMaze = CanvasMaze(grid, conf, maze_solution=solution)
     canvas.add_child(maze)
     canvas.render_canvas(True)
     window.loop()

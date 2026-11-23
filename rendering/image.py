@@ -77,7 +77,7 @@ class MlxImage:
                     bg_bytes: bytes = bg.to_bytes(image.iformat)
                     for b in range(4):
                         row[i + b] = bg_bytes[b]
-                if (image.iformat == 0):
+                elif (image.iformat == 0):
                     # RGBA -> BGRA (little endian)
                     row[i], row[i + 2] = row[i + 2], row[i]
                 else:

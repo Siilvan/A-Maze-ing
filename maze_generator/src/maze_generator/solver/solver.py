@@ -47,7 +47,9 @@ class SolverBot():
         else:
             self._slow_solve()
             result = min(self.paths, key=len) if self.paths else None
-        return result
+        if (result is not None):
+            return [(t[1], t[0]) for t in result]
+        return None
 
     def _fast_solve(self) -> list[tuple[int, int]] | None:
         """
