@@ -2,8 +2,10 @@ from pathlib import Path
 import random
 import time
 
+from rendering import Colors
 from rendering.canvas import CanvasElement, Rect
 from maze_generator import Logger
+from rendering.colors import Color
 from rendering.image import MlxImage
 from rendering.vector import Vector2
 from rendering.window import MlxWindow
@@ -59,7 +61,12 @@ class CanvasMaze(CanvasElement):
         #     return self.image_cache[cell]
         # Logger.get().i(f"{cell} not cached, creating new image")
         path: str = self._get_cell_image_path(cell, cell_pos)
-        img: MlxImage | None = MlxImage.from_image(self.window.mlx, self.window.mptr, path, scale=CELL_SCALE)
+        fill_color: Color = Colors.TRANSPARENT
+        if (cell == N + E + S + W):
+            fill_color = Colors.RED
+        img: MlxImage | None = MlxImage.from_image(self.window.mlx, self.window.mptr,
+                                                   path, scale=CELL_SCALE, bg=fill_color,
+                                                   bg_padding=10)
         if (img is None):
             return Logger.get().e("Failed to generate cell image.")
         self.image_cache[cell] = img
