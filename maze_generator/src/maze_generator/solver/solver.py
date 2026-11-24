@@ -64,14 +64,14 @@ class SolverBot():
         """
         queue = deque([self.entry])
         visited = {self.entry}
-        parent_cell: dict[tuple[int, int], tuple[int, int]] = {}
+        parents: dict[tuple[int, int], tuple[int, int]] = {}
         while queue:
             curr_cell: tuple[int, int] = queue.popleft()
             if curr_cell == self.exit:
                 path = []
-                while curr_cell in parent_cell:
+                while curr_cell in parents:
                     path.append(curr_cell)
-                    curr_cell = parent_cell[curr_cell]
+                    curr_cell = parents[curr_cell]
                 path.append(self.entry)
                 path.reverse()
                 return path
@@ -83,7 +83,7 @@ class SolverBot():
                     continue
                 queue.append(neighbour)
                 visited.add(neighbour)
-                parent_cell[neighbour] = curr_cell
+                parents[neighbour] = curr_cell
         return None
 
     def _slow_solve(self) -> None:

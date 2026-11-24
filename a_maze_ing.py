@@ -62,6 +62,8 @@ def main() -> None:
     canvas: Canvas = Canvas(window)
     container: CanvasBoxContainer = CanvasBoxContainer()
     solution: list[tuple[int, int]] | None = generator.get_solution()
+    if (solution is None):
+        Logger.get().e("Failed to solve maze.")
     maze: CanvasMaze = CanvasMaze(grid, conf, maze_solution=solution)
     canvas.add_child(maze)
     canvas.render_canvas(True)
