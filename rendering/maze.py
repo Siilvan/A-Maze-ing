@@ -76,7 +76,6 @@ class CanvasMaze(CanvasElement):
             fill_padding = round(self.cell_size[0] / 2)
         elif (self.maze_solution is not None):
             if (cell_pos in self.maze_solution):
-                print(f"pos: {cell_pos}, cell: {cell}")
                 fill_color = Colors.RED
                 fill_padding = fill_padding = round(self.cell_size[0] / 1.7)
         img: MlxImage | None = MlxImage.from_image(self.window.mlx, self.window.mptr,
