@@ -28,8 +28,8 @@ class SolverBot():
         and an empty list where slow_solve stores the paths it finds.
         """
         self.grid = grid
-        self.entry: tuple[int, int] = conf.entry_pos
-        self.exit: tuple[int, int] = conf.exit_pos
+        self.entry: tuple[int, int] = (conf.entry_pos[1], conf.entry_pos[0])
+        self.exit: tuple[int, int] = (conf.exit_pos[1], conf.exit_pos[0])
         self.paths: list[list[tuple[int, int]]] = []
 
     def solve(self, fast: bool) -> list[tuple[int, int]] | None:
