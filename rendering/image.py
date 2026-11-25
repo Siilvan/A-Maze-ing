@@ -46,7 +46,13 @@ class MlxImage:
                 )
 
     @classmethod
-    def from_image(cls, mlx: Mlx, mlxptr: int, image_path: str, scale: float = 1) -> "MlxImage | None":
+    def from_image(cls,
+                   mlx: Mlx,
+                   mlxptr: int,
+                   image_path: str,
+                   scale: float = 1,
+                   bg: Color = Colors.TRANSPARENT,
+                   bg_padding: int = 0) -> "MlxImage | None":
         """
         Creates a new MlxImage instance from an existing image
         """
@@ -64,7 +70,14 @@ class MlxImage:
             row = bytearray(src[src_start:src_start + width * 4])
             for x in range(width):
                 i = x * 4
-                if image.iformat == 0:
+                alpha: int = row[i + 3]
+                if (alpha <= 0 and bg.a != 0
+                    and (x > bg_padding and x < width - bg_padding)
+                    and (y > bg_padding and y < height - bg_padding)):
+                    bg_bytes: bytes = bg.to_bytes(image.iformat)
+                    for b in range(4):
+                        row[i + b] = bg_bytes[b]
+                elif (image.iformat == 0):
                     # RGBA -> BGRA (little endian)
                     row[i], row[i + 2] = row[i + 2], row[i]
                 else:

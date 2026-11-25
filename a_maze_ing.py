@@ -1,14 +1,16 @@
 from pathlib import Path
+import sys
 import time
 
 from maze_generator import (
     MazeConfig, RowByRowMazeGenerator,
     MazeSizeException, MazeGenerationException, ManualExit,
     Logger, SolverBot)
+from maze_generator.dfs_generator import DFSMazeGenerator
 from maze_generator.helpers import errors
 from rendering.canvas import Canvas
 from rendering import Colors
-from rendering.elements import CanvasText, CanvasMaze, CanvasSettings
+from rendering.elements import CanvasText, CanvasMaze, CanvasSettings, CanvasBoxContainer
 from rendering.vector import Vector2
 from rendering.window import MlxWindow
 
@@ -20,12 +22,16 @@ def load_conf(conf_path: str) -> MazeConfig | None:
     """
     p = Path(conf_path)
     if not p.exists():
-        Logger.get().w("Specified config path does not exist, using default instead.")
+        Logger.get().w(
+            "Specified config path does not exist, using default values instead."
+        )
         return MazeConfig()
     try:
         return MazeConfig.from_file(conf_path)
     except MazeConfig.ParseError as e:
-        Logger.get().e(f"Parse error on line ({e.line_n}): {e.msg}\n{e.line[:-1]} << HERE")
+        Logger.get().e(
+            f"Parse error: {e.msg}\n\n\t{e.line_n}: {e.line[:-1]} << HERE\n"
+        )
     except MazeSizeException as e:
         Logger.get().e(f"{e}")
     except MazeGenerationException as e:
@@ -35,7 +41,12 @@ def load_conf(conf_path: str) -> MazeConfig | None:
     return None
 
 def main() -> None:
-    conf: MazeConfig | None = load_conf("maze.conf")
+    conf: MazeConfig | None = None
+    if (len(sys.argv) < 2):
+        Logger.get().w("No config specified, using default values instead.")
+        conf = MazeConfig()
+    else:
+        conf = load_conf(sys.argv[1])
     if (conf is None):
         Logger.get().e("Failed to load configuration.")
         return
@@ -49,8 +60,11 @@ def main() -> None:
     window: MlxWindow = MlxWindow()
     window.init_window((1920, 1080), Colors.DARK_GRAY, "A-Maze-Ing!")
     canvas: Canvas = Canvas(window)
-    container: CanvasHBoxContainer = CanvasHBoxContainer()
-    maze: CanvasMaze = CanvasMaze(grid)
+    container: CanvasBoxContainer = CanvasBoxContainer()
+    solution: list[tuple[int, int]] | None = generator.get_solution()
+    if (solution is None):
+        Logger.get().e("Failed to solve maze.")
+    maze: CanvasMaze = CanvasMaze(grid, conf, maze_solution=solution)
     canvas.add_child(maze)
     canvas.render_canvas(True)
     window.loop()

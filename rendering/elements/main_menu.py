@@ -56,10 +56,10 @@ class CanvasMainMenu(CanvasElement):
         print(f"{self.curr_maze.rect.size}\n{self.rect.size}")
 
     def get_seed(self):
-        print('print(f"{my_hexadecimal_grid}")')
+        pass
 
     def bonus(self):
-        print("open(Doom)")
+        pass
 
     def _initialize(self) -> None:
         self.add_child(self.vbox)

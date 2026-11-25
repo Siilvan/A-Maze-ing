@@ -28,8 +28,8 @@ class SolverBot():
         and an empty list where slow_solve stores the paths it finds.
         """
         self.grid = grid
-        self.entry: tuple[int, int] = conf.entry_pos
-        self.exit: tuple[int, int] = conf.exit_pos
+        self.entry: tuple[int, int] = (conf.entry_pos[1], conf.entry_pos[0])
+        self.exit: tuple[int, int] = (conf.exit_pos[1], conf.exit_pos[0])
         self.paths: list[list[tuple[int, int]]] = []
 
     def solve(self, fast: bool) -> list[tuple[int, int]] | None:
@@ -47,7 +47,9 @@ class SolverBot():
         else:
             self._slow_solve()
             result = min(self.paths, key=len) if self.paths else None
-        return result
+        if (result is not None):
+            return [(t[1], t[0]) for t in result]
+        return None
 
     def _fast_solve(self) -> list[tuple[int, int]] | None:
         """
@@ -62,14 +64,14 @@ class SolverBot():
         """
         queue = deque([self.entry])
         visited = {self.entry}
-        parent_cell: dict[tuple[int, int], tuple[int, int]] = {}
+        parents: dict[tuple[int, int], tuple[int, int]] = {}
         while queue:
             curr_cell: tuple[int, int] = queue.popleft()
             if curr_cell == self.exit:
                 path = []
-                while curr_cell in parent_cell:
+                while curr_cell in parents:
                     path.append(curr_cell)
-                    curr_cell = parent_cell[curr_cell]
+                    curr_cell = parents[curr_cell]
                 path.append(self.entry)
                 path.reverse()
                 return path
@@ -81,7 +83,7 @@ class SolverBot():
                     continue
                 queue.append(neighbour)
                 visited.add(neighbour)
-                parent_cell[neighbour] = curr_cell
+                parents[neighbour] = curr_cell
         return None
 
     def _slow_solve(self) -> None:

@@ -1,3 +1,4 @@
+import random
 from typing import Any
 from .utils import *
 from .helpers import MazeGenerationException, MazeSizeException
@@ -18,8 +19,22 @@ class MazeConfig:
                  perfect: bool = False,
                  width: int = 50,
                  height: int = 50,
-                 logo:str = "42"
+                 logo:str = "42",
+                 seed: int | None = None
                  ) -> None:
+        # Dictionary of the expected type for each attribute
+        # used for parsing
+        self.expected_types: dict[str, type] = {
+                "exit_pos": tuple,
+                "entry_pos": tuple,
+                "output_pvaiath": str,
+                "perfect": bool,
+                "width": int,
+                "height": int,
+                "logo": str,
+                "seed": int
+                }
+        self.seed: int | None = seed
         self.width: int = width
         self.height: int = height
         self.entry_pos: tuple[int, int] = entry_pos
@@ -31,6 +46,15 @@ class MazeConfig:
         self.output_path: str = output_path
         self.perfect: bool = perfect
         self.logo: str = logo
+
+    def get_seed(self) -> int:
+        """
+        Returns the config seed of the maze if it exists,
+        a random seed otherwise
+        """
+        if (self.seed is None):
+            return random.getrandbits(8 * 4)
+        return self.seed
 
     def validate_config(self) -> bool:
         """
@@ -64,25 +88,52 @@ class MazeConfig:
         config: "MazeConfig" = cls()
         with open(path, "r") as f:
             line_n : int = 1
-            line: str = f.readline().strip()
+            line: str = f.readline()
             while (line != ""):
-                tokens = line.split("=")
-                if (len(tokens) != 2):
+                if (config._should_skip_line(line)):
+                    line = f.readline()
+                    line_n += 1
+                    continue
+                key, val = config._parse_line(line, line_n)
+                if (not config._assign_key(key, val)):
                     raise MazeConfig.ParseError(
-                            msg="Unparseable line",
-                            line_n=line_n,
-                            line=line)
-                if (not config._assign_key(tokens[0], tokens[1])):
-                    raise MazeConfig.ParseError(
-                            msg=f"Failed to assign {tokens[1]} to {tokens[0]}, " +
+                            msg=f"Failed to assign \033[32m\"{val}\"\033[0m to \033[33m{key}\033[0m, " +
                             "ensure the type and naming are correct.",
                             line_n=line_n,
                             line=line
                             )
                 line = f.readline()
+                line_n += 1
         config.validate_config()
         return config
 
+    def _should_skip_line(self, line: str) -> bool:
+        """
+        Checks wether the provided line should be skipped:
+        (comment or empty line)
+        """
+        line = line.strip()
+        return (line.startswith("#") or line == "")
+
+    def _parse_line(self, line: str, line_n: int) -> tuple[str, str]:
+        """
+        Parses a config line, returns a tuple containing (key, val)
+        """
+        line = line.strip()
+        eq_pos: int = line.find("=")
+        if (eq_pos == -1):
+            raise MazeConfig.ParseError(
+                    msg="Unparseable line",
+                    line_n=line_n,
+                    line=line)
+        key: str = line[:eq_pos]
+        comment_pos: int = line.find("#")
+        val: str = ""
+        if (comment_pos < 0):
+            val = line[eq_pos + 1:]
+        else:
+            val = line[eq_pos + 1:comment_pos]
+        return (key, val)
 
     def _assign_key(self, key: str, val: Any) -> bool:
         """
@@ -93,7 +144,7 @@ class MazeConfig:
         key = key.lower()
         # Ensure that this object has an attribute with the keyname
         if (hasattr(self, key)):
-            parsed: Any = try_parse(val, type(getattr(self, key)))
+            parsed: Any = try_parse(val, self.expected_types[key])
             if (parsed is None):
                 return False
             setattr(self, key, parsed)

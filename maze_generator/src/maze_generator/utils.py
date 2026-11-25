@@ -1,5 +1,5 @@
 from .helpers import Logger
-from typing import Any
+from typing import Any, Callable
 
 def parse_position_tuple(
         string: str
@@ -54,19 +54,24 @@ def solution_to_directions(solution: list[tuple[int, int]]) -> str | None:
         if (previous is None):
             previous = c
             continue
-        direction: tuple[int, int] = (c[0] - previous[0],
-                                      c[1] - previous[1])
+        direction: tuple[int, int] = tuple_op(c, previous, lambda a, b: a - b)
         match direction:
-            case (1, 0):
-                string += "N"
-            case (-1, 0):
-                string += "S"
             case (0, 1):
+                string += "N"
+            case (1, 0):
                 string += "E"
             case (0, -1):
+                string += "S"
+            case (-1, 0):
                 string += "W"
             case _:
                 Logger.get().e(f"Got unknown direction while parsing solution: {direction}")
                 return 
         previous = c
     return string
+
+def tuple_op(a: tuple[int, int], b: tuple[int, int], op: Callable[[int, int], int]) -> tuple[int, int]:
+    """
+    subtracts two position tuples and returns a new tuple with the result
+    """
+    return (op(a[0], b[0]), op(a[1], b[1]))
