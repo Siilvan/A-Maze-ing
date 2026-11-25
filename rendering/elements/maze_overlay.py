@@ -19,8 +19,7 @@ class MazeOverlay(CanvasElement):
         self.show_solution = False
         self._trail: MlxImage | None = None
         self.update_vars(maze)
-        if (solution is not None):
-            self.set_solution(maze, solution)
+        self.set_solution(maze, solution)
 
     def update_vars(self, maze: CanvasMaze) -> None:
         new_scale = maze.cell_scale
@@ -57,15 +56,20 @@ class MazeOverlay(CanvasElement):
 
     def set_solution(self,
                      maze: CanvasMaze,
-                     solution: list[tuple[int, int]]
-                     ) -> None:
+                     solution: list[tuple[int, int]] | None) -> None:
         self.update_vars(maze)
-        self.solution = [Vector2.from_tuple(c) for c in solution]
+        self.solution: list[Vector2] | None = None
+        if (solution is not None):
+            self.solution = [
+                    Vector2.from_tuple(c) for c in solution
+                    ]
 
     def draw_solution(self) -> None:
+        if (self.solution is None):
+            return None
         marker = self._get_trail()
         if (marker is None):
-            return
+            return None
         for step in self.solution[1:-1]:
             pos = Vector2(
                 (step.x * self.cell_size[0]) + self.global_position.x,
@@ -81,7 +85,7 @@ class MazeOverlay(CanvasElement):
 
     @override
     def clear(self) -> None:
-        if not self.dirty:
+        if not self.dirty or self.solution is None:
             return
         clear = MlxImage.from_image(
             self.window.mlx, self.window.mptr,
