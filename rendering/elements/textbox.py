@@ -55,8 +55,8 @@ class CanvasTextBox(CanvasElement):
         return super()._draw()
 
     def get_rect(self) -> Rect:
-        image: MlxImage | None = self._get_string_image(self.text)
-        if image is None:
+        image: MlxImage | None = self._get_string_image(f"'{self.text}'")
+        if (image is None):
             logger.e(f"Failed to generate image for string '{self.text}'")
             raise RuntimeError
         self.rect = Rect(
@@ -90,19 +90,18 @@ class CanvasTextBox(CanvasElement):
             return
         if not self.focused:
             return
-        self.clear()
         if button == 65293:
             self.focused = False
         elif button == 65288:
             self.text = self.text[:-1]
-        else:
-            if 32 <= button <= 126:
-                if button in SHIFT_MAP and self.shift_held:
-                    char = SHIFT_MAP[button]
-                else:
-                    char = chr(button)
-                self.text += char
-        self._draw()
+            self.dirty = True
+        elif 32 <= button <= 126:
+            if button in SHIFT_MAP and self.shift_held:
+                char = SHIFT_MAP[button]
+            else:
+                char = chr(button)
+            self.text += char
+            self.dirty = True
 
     def key_release(self, button: int, fil: None = None) -> None:
         if button in (65505, 65506):
