@@ -6,30 +6,35 @@ from maze_generator import Logger
 from rendering.colors import Color, Colors
 from rendering.image import MlxImage
 
-
 logger = Logger.get()
+
 
 class MlxWindow:
     """
     A window wrapper for the Mlx Library
     """
+
     def __init__(self) -> None:
         self.mlx = Mlx()
-        if (self.mlx is None):
+        if self.mlx is None:
             return logger.e("Failed to get the connection to the x server")
         self.mptr: int = self.mlx.mlx_init()
         logger.i("Successfully initialized window")
 
-    def init_window(self,
-                    size: tuple[int, int],
-                    bg: Color = Colors.WHITE,
-                    name: str = "Window",) -> None:
+    def init_window(
+        self,
+        size: tuple[int, int],
+        bg: Color = Colors.WHITE,
+        name: str = "Window",
+    ) -> None:
         """
         Initializes the Mlx window
         """
         self.width: int = size[0]
         self.height: int = size[1]
-        self.wptr: int = self.mlx.mlx_new_window(self.mptr, self.width, self.height, name)
+        self.wptr: int = self.mlx.mlx_new_window(
+            self.mptr, self.width, self.height, name
+        )
         self.bg = bg
         self._setup(bg)
 
@@ -64,18 +69,22 @@ class MlxWindow:
         self.mlx.mlx_loop(self.mptr)
 
     def put_image(self, img: MlxImage, x: int, y: int) -> None:
-        self.mlx.mlx_put_image_to_window(self.mptr, self.wptr, img.pointer, x, y)
+        self.mlx.mlx_put_image_to_window(
+            self.mptr, self.wptr, img.pointer, x, y
+        )
 
     def _setup(self, bg: Color) -> None:
         """
         Sets up the Mlx Window, puts the screen to white
         """
         self.mlx.mlx_clear_window(self.mptr, self.wptr)
-        background: MlxImage = MlxImage.new_image(self.mlx, self.mptr, self.width, self.height)
+        background: MlxImage = MlxImage.new_image(
+            self.mlx, self.mptr, self.width, self.height
+        )
         background.clear_image(bg)
         self.put_image(background, 0, 0)
         background.destroy(self.mlx, self.mptr)
 
+
 if __name__ == "__main__":
     logger.w("You're running the wrong file dawg")
-

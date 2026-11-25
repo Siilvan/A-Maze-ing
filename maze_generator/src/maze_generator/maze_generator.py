@@ -10,6 +10,7 @@ from abc import ABC, abstractmethod
 
 N, E, S, W = 1, 2, 4, 8
 
+
 class MazeGenerator(ABC):
     """
     Base class for the maze generators.
@@ -32,7 +33,9 @@ class MazeGenerator(ABC):
         logo = Logos(conf.logo.strip("\n"), conf)
         self.blocked = logo.make_logo()
 
-    def remove_wall_between(self, cell_a: tuple[int, int], cell_b: tuple[int, int]) -> None:
+    def remove_wall_between(
+        self, cell_a: tuple[int, int], cell_b: tuple[int, int]
+    ) -> None:
         """
         Removes the wall between two cells.
 
@@ -40,7 +43,9 @@ class MazeGenerator(ABC):
         """
         c_a: int = self._get_cell_at(cell_a)
         c_b: int = self._get_cell_at(cell_b)
-        direction: tuple[int, int] = tuple_op(cell_a, cell_b, lambda a, b: a - b)
+        direction: tuple[int, int] = tuple_op(
+            cell_a, cell_b, lambda a, b: a - b
+        )
         match direction:
             case (0, 1):
                 self._set_cell_at(cell_a, c_a & ~N)
@@ -65,7 +70,9 @@ class MazeGenerator(ABC):
         seed: int = self.config.get_seed()
         Logger.get().i(f"Generating maze with seed: {seed}")
         random.seed(seed)
-        self.grid = [[15 for _ in range(self.width)] for _ in range(self.height)]
+        self.grid = [
+            [15 for _ in range(self.width)] for _ in range(self.height)
+        ]
         self.initial_grid()
         if not self.perfect:
             self.remove_dead_ends()
@@ -88,7 +95,7 @@ class MazeGenerator(ABC):
         nbr = pow(2, pwr)
         row_dir = row + (pwr % 2 == 0) * (pwr - 1)
         cell_dir = col + (pwr % 2) * (2 - pwr)
-        opposite = (1 << ((pwr + 2) % 4))
+        opposite = 1 << ((pwr + 2) % 4)
         if self.is_blocked(row, col):
             return
         if remove:
@@ -104,7 +111,7 @@ class MazeGenerator(ABC):
         cnt = 0
         n = cell
         while n > 0:
-            n &= (n - 1)
+            n &= n - 1
             cnt += 1
         if cnt == 3:
             allow = 15
@@ -126,8 +133,8 @@ class MazeGenerator(ABC):
                 allow &= ~W
         else:
             allow = 0
-        return (allow)
-    
+        return allow
+
     def _get_cell_at(self, pos: tuple[int, int]) -> int:
         """
         Returns the cell at the provided position.
@@ -216,47 +223,57 @@ class MazeGenerator(ABC):
         tuple[int, int, int]
         with (x, y, cell)
         """
-        if (not self.generated):
-            Logger.get().w("Caution, iterating over the grid of an ungenerated maze")
+        if not self.generated:
+            Logger.get().w(
+                "Caution, iterating over the grid of an ungenerated maze"
+            )
         for y in range(self.height):
             for x in range(self.width):
                 yield (x, y, self.grid[y][x])
 
     def write_grid_to_file(self) -> None:
         logger = Logger.get()
-        if (not self.generated):
-            return logger.e("Cannot write to file, " +
-                            "the grid has not been generated yet!")
+        if not self.generated:
+            return logger.e(
+                "Cannot write to file, "
+                + "the grid has not been generated yet!"
+            )
         solution: list[tuple[int, int]] | None = self.get_solution()
-        if (solution is None):
-            return logger.e("Cannot write to file, " +
-                            "Failed to solve the maze!")
+        if solution is None:
+            return logger.e(
+                "Cannot write to file, " + "Failed to solve the maze!"
+            )
         string_solution: str | None = solution_to_directions(solution)
-        if (string_solution is None):
-            return logger.e("Cannot write to file, " +
-                            "Failed to parse solution!")
+        if string_solution is None:
+            return logger.e(
+                "Cannot write to file, " + "Failed to parse solution!"
+            )
         with open(self.config.output_path, "w") as f:
             for x, y, cell in self.grid_iterate():
                 f.write(hex(cell)[2:])
-                if (x == self.width - 1):
+                if x == self.width - 1:
                     f.write("\n")
             f.write(f"""
 {self.config.entry_pos[0]}, {self.config.entry_pos[1]}
 {self.config.exit_pos[0]}, {self.config.exit_pos[1]}
 {string_solution}
 """)
-        Logger.get().i(f"Successfully wrote maze to file: {self.config.output_path}")
+        Logger.get().i(
+            f"Successfully wrote maze to file: {self.config.output_path}"
+        )
 
     def get_solution(self) -> list[tuple[int, int]] | None:
         """
-        Returns the solution of this maze. returns the path as a list of 
+        Returns the solution of this maze. returns the path as a list of
         tuples each representing the coordinates of the cells.
         None on failure.
         """
         from .solver import SolverBot
-        if (not self.generated):
+
+        if not self.generated:
             Logger.get().w("Caution, trying to solve an ungenerated maze.")
         return SolverBot(self.grid, self.config).solve(True)
+
 
 class RowByRowMazeGenerator(MazeGenerator):
     """
@@ -267,6 +284,7 @@ class RowByRowMazeGenerator(MazeGenerator):
     so nothing gets trapped. Good for big mazes since it only looks at one
     row at a time.
     """
+
     def __init__(self, conf: MazeConfig) -> None:
         """Same as the base setup, with the extra needed set traching stuff."""
         super().__init__(conf)
@@ -283,11 +301,12 @@ class RowByRowMazeGenerator(MazeGenerator):
         for y in range(self.height):
             self.sets = self.new_sets
             self.new_sets = []
-            merge_chance: float = (0.55 if y != self.height - 1 else 1)
+            merge_chance: float = 0.55 if y != self.height - 1 else 1
             if y != 0:
                 self.initialise_sets(self.grid[y - 1])
-                self.h_corridors(self.grid[y], y,
-                                 merge_chance, self.grid[y - 1])
+                self.h_corridors(
+                    self.grid[y], y, merge_chance, self.grid[y - 1]
+                )
             else:
                 self.initialise_sets()
                 self.h_corridors(self.grid[y], y, merge_chance)
@@ -313,8 +332,10 @@ class RowByRowMazeGenerator(MazeGenerator):
                 while x < w and not self.is_blocked(y, x):
                     x += 1
                 segment = range(start, x)
-                if any(not self.is_blocked(y + 1, c) and ok[y + 1][c]
-                       for c in segment):
+                if any(
+                    not self.is_blocked(y + 1, c) and ok[y + 1][c]
+                    for c in segment
+                ):
                     for c in segment:
                         ok[y][c] = True
         self.ok = ok
@@ -322,9 +343,11 @@ class RowByRowMazeGenerator(MazeGenerator):
     def can_go_down(self, y: int, x: int) -> bool:
         """True if the cell and the one below it are
         free and the one below isn't a dead pocket."""
-        return (not self.is_blocked(y, x)
-                and not self.is_blocked(y + 1, x)
-                and self.ok[y + 1][x])
+        return (
+            not self.is_blocked(y, x)
+            and not self.is_blocked(y + 1, x)
+            and self.ok[y + 1][x]
+        )
 
     def force_valid_sets(self, row: list[int], y: int) -> None:
         """Makes sure every set in the row has
@@ -344,10 +367,7 @@ class RowByRowMazeGenerator(MazeGenerator):
                 set_dict[s_id].append(x)
             stuck_sets = []
             for s_id, cell_list in set_dict.items():
-                valid_cells = [
-                    c for c in cell_list
-                    if self.can_go_down(y, c)
-                ]
+                valid_cells = [c for c in cell_list if self.can_go_down(y, c)]
                 if not valid_cells:
                     stuck_sets.append(s_id)
             if not stuck_sets:
@@ -355,17 +375,22 @@ class RowByRowMazeGenerator(MazeGenerator):
             fixed = False
             for s_id in stuck_sets:
                 for x in set_dict[s_id]:
-                    if (x > 0 and self.new_sets[x - 1] != s_id and
-                       not self.is_blocked(y, x - 1)):
+                    if (
+                        x > 0
+                        and self.new_sets[x - 1] != s_id
+                        and not self.is_blocked(y, x - 1)
+                    ):
                         neighbour_set = self.new_sets[x - 1]
                         row[x - 1] &= ~E
                         row[x] &= ~W
                         self.merge_sets(s_id, neighbour_set)
                         fixed = True
                         break
-                    elif (x < self.width - 1
-                          and self.new_sets[x + 1] != s_id
-                          and not self.is_blocked(y, x + 1)):
+                    elif (
+                        x < self.width - 1
+                        and self.new_sets[x + 1] != s_id
+                        and not self.is_blocked(y, x + 1)
+                    ):
                         neighbour_set = self.new_sets[x + 1]
                         row[x + 1] &= ~W
                         row[x] &= ~E
@@ -416,8 +441,9 @@ class RowByRowMazeGenerator(MazeGenerator):
             else:
                 set_dict[self.new_sets[x]] = [x]
         for cell_list in set_dict.values():
-            valid_cells = [cell for cell in cell_list
-                           if self.can_go_down(y, cell)]
+            valid_cells = [
+                cell for cell in cell_list if self.can_go_down(y, cell)
+            ]
             if not valid_cells:
                 continue
 
@@ -426,22 +452,30 @@ class RowByRowMazeGenerator(MazeGenerator):
                 if self.is_blocked(y, cell) or self.is_blocked(y + 1, cell):
                     continue
                 dead_pocket_below = not self.ok[y + 1][cell]
-                if (cell == forced
-                   or dead_pocket_below
-                   or random.random() < 0.4):
+                if (
+                    cell == forced
+                    or dead_pocket_below
+                    or random.random() < 0.4
+                ):
                     row[cell] &= ~S
 
     def h_corridors(
-            self, row: list[int], y: int,
-            merge_chance: float, row_above: list[int] = []
-            ) -> None:
+        self,
+        row: list[int],
+        y: int,
+        merge_chance: float,
+        row_above: list[int] = [],
+    ) -> None:
         """Randomly joins neighbouring cells of different
         sets sideways (not through the logo),
         then opens the north wall of cells that connect up to the row above."""
         for x in range(self.width - 1):
-            if (self.new_sets[x] != self.new_sets[x + 1] and
-               random.random() < merge_chance and
-               not self.is_blocked(y, x) and not self.is_blocked(y, x + 1)):
+            if (
+                self.new_sets[x] != self.new_sets[x + 1]
+                and random.random() < merge_chance
+                and not self.is_blocked(y, x)
+                and not self.is_blocked(y, x + 1)
+            ):
                 row[x] &= ~E
                 row[x + 1] &= ~W
                 self.merge_sets(self.new_sets[x], self.new_sets[x + 1])

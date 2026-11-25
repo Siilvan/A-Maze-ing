@@ -1,22 +1,24 @@
-from pathlib import Path
-
 from mlx import Mlx
-from PIL import Image, ImageFont
+from PIL import Image
 
-from maze_generator import Logger
 from rendering.colors import Color, Colors
+
 
 class MlxImage:
     """
     Class to store an Mlx image
     """
-    def __init__(self, pixels: memoryview,
-                 bppixels: int,
-                 sizeline: int,
-                 iformat: int,
-                 width: int, 
-                 height: int,
-                 pointer: int) -> None:
+
+    def __init__(
+        self,
+        pixels: memoryview,
+        bppixels: int,
+        sizeline: int,
+        iformat: int,
+        width: int,
+        height: int,
+        pointer: int,
+    ) -> None:
         self.pixels: memoryview = pixels
         self.bppixels: int = bppixels
         self.sizeline: int = sizeline
@@ -26,33 +28,37 @@ class MlxImage:
         self.pointer: int = pointer
 
     @classmethod
-    def new_image(cls, mlx: Mlx, mlxptr: int, width: int, height: int) -> "MlxImage":
+    def new_image(
+        cls, mlx: Mlx, mlxptr: int, width: int, height: int
+    ) -> "MlxImage":
         """
         Returns a new ImageData object from image at the specified
         pointer
         """
         ptr: int | None = mlx.mlx_new_image(mlxptr, width, height)
-        if ptr == None:
+        if ptr is None:
             raise RuntimeError("Unexpected error, failed to create an image.")
-        (p, bpp, sl, f) = mlx.mlx_get_data_addr(ptr) 
+        p, bpp, sl, f = mlx.mlx_get_data_addr(ptr)
         return MlxImage(
-                pixels=p,
-                bppixels=bpp,
-                sizeline=sl,
-                iformat=f,
-                width=width,
-                height=height,
-                pointer=ptr
-                )
+            pixels=p,
+            bppixels=bpp,
+            sizeline=sl,
+            iformat=f,
+            width=width,
+            height=height,
+            pointer=ptr,
+        )
 
     @classmethod
-    def from_image(cls,
-                   mlx: Mlx,
-                   mlxptr: int,
-                   image_path: str,
-                   scale: float = 1,
-                   bg: Color = Colors.TRANSPARENT,
-                   bg_padding: int = 0) -> "MlxImage | None":
+    def from_image(
+        cls,
+        mlx: Mlx,
+        mlxptr: int,
+        image_path: str,
+        scale: float = 1,
+        bg: Color = Colors.TRANSPARENT,
+        bg_padding: int = 0,
+    ) -> "MlxImage | None":
         """
         Creates a new MlxImage instance from an existing image
         """
@@ -71,21 +77,24 @@ class MlxImage:
             for x in range(width):
                 i = x * 4
                 alpha: int = row[i + 3]
-                if (alpha <= 0 and bg.a != 0
+                if (
+                    alpha <= 0
+                    and bg.a != 0
                     and (x > bg_padding and x < width - bg_padding)
-                    and (y > bg_padding and y < height - bg_padding)):
+                    and (y > bg_padding and y < height - bg_padding)
+                ):
                     bg_bytes: bytes = bg.to_bytes(image.iformat)
                     for b in range(4):
                         row[i + b] = bg_bytes[b]
-                elif (image.iformat == 0):
+                elif image.iformat == 0:
                     # RGBA -> BGRA (little endian)
                     row[i], row[i + 2] = row[i + 2], row[i]
                 else:
                     # RGBA -> ARGB (big endian)
-                    row[i:i+4] = row[i+3:i+4] + row[i:i+3]
+                    row[i:i + 4] = row[i + 3:i + 4] + row[i:i + 3]
             image.pixels[dst_start:dst_start + width * 4] = row
         return image
-    
+
     def destroy(self, mlx: Mlx, mptr: int) -> None:
         """
         frees the memory associated with the image.
@@ -98,7 +107,7 @@ class MlxImage:
         Sets the pixel at pos x, y of an image
         """
         offset = y * self.sizeline + x * (self.bppixels // 8)
-        self.pixels[offset: offset + 4] = color.to_bytes(cformat=self.iformat)
+        self.pixels[offset:offset + 4] = color.to_bytes(cformat=self.iformat)
 
     def clear_image(self, color: Color = Colors.BLACK):
         """
@@ -106,4 +115,4 @@ class MlxImage:
         """
         for x in range(self.width):
             for y in range(self.height):
-                self.set_pixel( x, y, color)
+                self.set_pixel(x, y, color)

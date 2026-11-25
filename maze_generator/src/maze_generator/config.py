@@ -1,6 +1,7 @@
 import random
 from typing import Any
-from .utils import *
+
+from .utils import try_parse
 from .helpers import MazeGenerationException, MazeSizeException
 
 
@@ -12,35 +13,35 @@ class MazeConfig:
             self.line_n = line_n
             self.line = line
 
-    def __init__(self,
-                 exit_pos: tuple[int, int] | None = None,
-                 entry_pos: tuple[int, int] = (0, 0),
-                 output_path: str = "output.mz",
-                 perfect: bool = False,
-                 width: int = 50,
-                 height: int = 50,
-                 logo:str = "42",
-                 seed: int | None = None
-                 ) -> None:
+    def __init__(
+        self,
+        exit_pos: tuple[int, int] | None = None,
+        entry_pos: tuple[int, int] = (0, 0),
+        output_path: str = "output.mz",
+        perfect: bool = False,
+        width: int = 50,
+        height: int = 50,
+        logo: str = "42",
+        seed: int | None = None,
+    ) -> None:
         # Dictionary of the expected type for each attribute
         # used for parsing
         self.expected_types: dict[str, type] = {
-                "exit_pos": tuple,
-                "entry_pos": tuple,
-                "output_pvaiath": str,
-                "perfect": bool,
-                "width": int,
-                "height": int,
-                "logo": str,
-                "seed": int
-                }
+            "exit_pos": tuple,
+            "entry_pos": tuple,
+            "output_pvaiath": str,
+            "perfect": bool,
+            "width": int,
+            "height": int,
+            "logo": str,
+            "seed": int,
+        }
         self.seed: int | None = seed
         self.width: int = width
         self.height: int = height
         self.entry_pos: tuple[int, int] = entry_pos
-        if (exit_pos is None):
-            self.exit_pos: tuple[int, int] = (self.width - 1,
-                                              self.height - 1)
+        if exit_pos is None:
+            self.exit_pos: tuple[int, int] = (self.width - 1, self.height - 1)
         else:
             self.exit_pos = exit_pos
         self.output_path: str = output_path
@@ -52,7 +53,7 @@ class MazeConfig:
         Returns the config seed of the maze if it exists,
         a random seed otherwise
         """
-        if (self.seed is None):
+        if self.seed is None:
             return random.getrandbits(8 * 4)
         return self.seed
 
@@ -64,44 +65,46 @@ class MazeConfig:
         returns True or False if the config is correct or not
         """
         if self.width < 2 or self.height < 2:
-            raise MazeSizeException(
-                "Maze must be at least 2 wide and 2 high")
-        if (not 0 <= self.entry_pos[0] < self.height
-            or not 0 <= self.entry_pos[1] < self.width):
-            raise MazeGenerationException(
-                "Entry position outside of maze.")
-        if (not 0 <= self.exit_pos[0] < self.height
-            or not 0 <= self.exit_pos[1] < self.width):
-            raise MazeGenerationException(
-                "Exit position outside of maze")
+            raise MazeSizeException("Maze must be at least 2 wide and 2 high")
+        if (
+            not 0 <= self.entry_pos[0] < self.height
+            or not 0 <= self.entry_pos[1] < self.width
+        ):
+            raise MazeGenerationException("Entry position outside of maze.")
+        if (
+            not 0 <= self.exit_pos[0] < self.height
+            or not 0 <= self.exit_pos[1] < self.width
+        ):
+            raise MazeGenerationException("Exit position outside of maze")
 
-        return (True)
+        return True
 
     @classmethod
     def from_file(cls, path: str) -> "MazeConfig":
         """
-        Attemps to parse a config object from a file of 
+        Attemps to parse a config object from a file of
         KEY=VALUE pairs.
 
         returns None on failure
         """
         config: "MazeConfig" = cls()
         with open(path, "r") as f:
-            line_n : int = 1
+            line_n: int = 1
             line: str = f.readline()
-            while (line != ""):
-                if (config._should_skip_line(line)):
+            while line != "":
+                if config._should_skip_line(line):
                     line = f.readline()
                     line_n += 1
                     continue
                 key, val = config._parse_line(line, line_n)
-                if (not config._assign_key(key, val)):
+                if not config._assign_key(key, val):
                     raise MazeConfig.ParseError(
-                            msg=f"Failed to assign \033[32m\"{val}\"\033[0m to \033[33m{key}\033[0m, " +
-                            "ensure the type and naming are correct.",
-                            line_n=line_n,
-                            line=line
-                            )
+                        msg=f'Failed to assign \033[32m"{val}"\033[0m to' +
+                        f'\033[33m{key}\033[0m, ' +
+                        "ensure the type and naming are correct.",
+                        line_n=line_n,
+                        line=line,
+                    )
                 line = f.readline()
                 line_n += 1
         config.validate_config()
@@ -113,7 +116,7 @@ class MazeConfig:
         (comment or empty line)
         """
         line = line.strip()
-        return (line.startswith("#") or line == "")
+        return line.startswith("#") or line == ""
 
     def _parse_line(self, line: str, line_n: int) -> tuple[str, str]:
         """
@@ -121,18 +124,17 @@ class MazeConfig:
         """
         line = line.strip()
         eq_pos: int = line.find("=")
-        if (eq_pos == -1):
+        if eq_pos == -1:
             raise MazeConfig.ParseError(
-                    msg="Unparseable line",
-                    line_n=line_n,
-                    line=line)
+                msg="Unparseable line", line_n=line_n, line=line
+            )
         key: str = line[:eq_pos]
         comment_pos: int = line.find("#")
         val: str = ""
-        if (comment_pos < 0):
+        if comment_pos < 0:
             val = line[eq_pos + 1:]
         else:
-            val = line[eq_pos + 1:comment_pos]
+            val = line[eq_pos + 1: comment_pos]
         return (key, val)
 
     def _assign_key(self, key: str, val: Any) -> bool:
@@ -143,15 +145,15 @@ class MazeConfig:
         """
         key = key.lower()
         # Ensure that this object has an attribute with the keyname
-        if (hasattr(self, key)):
+        if hasattr(self, key):
             parsed: Any = try_parse(val, self.expected_types[key])
-            if (parsed is None):
+            if parsed is None:
                 return False
             setattr(self, key, parsed)
             return True
-        if (key == "entry"):
+        if key == "entry":
             return self._assign_key("entry_pos", val)
-        if (key == "exit"):
+        if key == "exit":
             return self._assign_key("exit_pos", val)
         return False
 
@@ -160,4 +162,3 @@ class MazeConfig:
 
     def __repr__(self) -> str:
         return str(self)
-

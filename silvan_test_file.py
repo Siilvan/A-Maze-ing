@@ -2,38 +2,56 @@ from pathlib import Path
 import time
 
 from maze_generator import (
-    MazeConfig, RowByRowMazeGenerator,
-    MazeSizeException, MazeGenerationException, ManualExit,
-    Logger, SolverBot)
-from rendering import (
-    Canvas, Colors, CanvasMaze, CanvasSettings, MlxWindow,
-    CanvasBoxContainer, Vector2, CanvasText, CanvasMainMenu
+    MazeConfig,
+    RowByRowMazeGenerator,
+    MazeSizeException,
+    MazeGenerationException,
+    ManualExit,
+    Logger,
+    SolverBot,
 )
+from rendering import (
+    Canvas,
+    Colors,
+    CanvasMaze,
+    CanvasSettings,
+    MlxWindow,
+    CanvasBoxContainer,
+    Vector2,
+    CanvasText,
+    CanvasMainMenu,
+)
+
 
 def load_conf(conf_path: str) -> MazeConfig | None:
     """
     Attempts to load the conf specified by `conf_path`
-    returns None on failure. 
+    returns None on failure.
     If the specified path does not point to a file, returns a default config.
     """
     p = Path(conf_path)
     if not p.exists():
-        Logger.get().w("Specified config path does not exist, using default instead.")
+        Logger.get().w(
+            "Specified config path does not exist, using default instead."
+        )
         return MazeConfig()
     try:
         return MazeConfig.from_file(conf_path)
     except MazeConfig.ParseError as e:
-        Logger.get().e(f"Parse error on line ({e.line_n}): {e.msg}\n{e.line[:-1]} << HERE")
+        Logger.get().e(
+            f"Parse error on line ({e.line_n}): {e.msg}\n{e.line[:-1]} << HERE"
+        )
     except MazeSizeException as e:
         Logger.get().e(f"{e}")
     except MazeGenerationException as e:
         Logger.get().e(f"{e}")
     return None
 
+
 def main() -> None:
     conf_path = "maze.conf"
     conf: MazeConfig | None = load_conf(conf_path)
-    if (conf is None):
+    if conf is None:
         Logger.get().e("Failed to load configuration.")
         return
     try:
@@ -42,7 +60,7 @@ def main() -> None:
     except ManualExit as e:
         Logger.get().e(f"{e}")
         return
-    grid : list[list[int]] = generator.get_maze()
+    grid: list[list[int]] = generator.get_maze()
     window: MlxWindow = MlxWindow()
     window.init_window((2560, 1440), Colors.DARK_GRAY, "A-Maze-Ing!")
     canvas: Canvas = Canvas(window)
@@ -56,7 +74,6 @@ def main() -> None:
     container.add_child(menu)
     # settings = CanvasSettings(conf, conf_path)
     # container.add_child(settings)
-
 
     canvas.render_canvas()
     window.loop()

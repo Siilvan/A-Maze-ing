@@ -3,8 +3,9 @@ from ..colors import Colors
 from ..maze import CanvasMaze
 from .container import CanvasBoxContainer
 from .button import CanvasButton
-from maze_generator import RowByRowMazeGenerator, MazeConfig, ManualExit
+from maze_generator import RowByRowMazeGenerator, MazeConfig
 from typing import override
+
 
 class CanvasMainMenu(CanvasElement):
     def __init__(self, conf: MazeConfig, curr_maze: CanvasMaze) -> None:
@@ -46,10 +47,11 @@ class CanvasMainMenu(CanvasElement):
     def _initialize(self) -> None:
         self.add_child(self.vbox)
         for option in self.options:
-            self.vbox.add_child(CanvasButton(
-                option,
-                getattr(self, option.lower().replace(" ", "_")),
-                30, Colors.LIGHT_GRAY))
-
-
-            
+            self.vbox.add_child(
+                CanvasButton(
+                    option,
+                    getattr(self, option.lower().replace(" ", "_")),
+                    30,
+                    Colors.LIGHT_GRAY,
+                )
+            )

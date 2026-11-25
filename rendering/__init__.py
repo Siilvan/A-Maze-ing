@@ -4,12 +4,27 @@ from .vector import Vector2
 from .colors import Colors
 
 from .elements import (
-    CanvasBoxContainer, CanvasSettings, CanvasText, CanvasMaze,
-    CanvasButton, CanvasTextBox, CanvasMainMenu)
+    CanvasBoxContainer,
+    CanvasSettings,
+    CanvasText,
+    CanvasMaze,
+    CanvasButton,
+    CanvasTextBox,
+    CanvasMainMenu,
+)
 
 __all__ = [
-    'MlxWindow', 'Canvas', 'Rect', 'CanvasElement',
-    'Vector2', 'Colors', 'CanvasBoxContainer', 'CanvasSettings',
-    'CanvasText', 'CanvasMaze', 'CanvasButton', 'CanvasTextBox',
-    'CanvasMainMenu'
-    ]
+    "MlxWindow",
+    "Canvas",
+    "Rect",
+    "CanvasElement",
+    "Vector2",
+    "Colors",
+    "CanvasBoxContainer",
+    "CanvasSettings",
+    "CanvasText",
+    "CanvasMaze",
+    "CanvasButton",
+    "CanvasTextBox",
+    "CanvasMainMenu",
+]

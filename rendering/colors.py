@@ -1,6 +1,7 @@
 from enum import Enum
 import random
 
+
 class Color:
     def __init__(self, r: int, g: int, b: int, a: int = 255) -> None:
         self.r = r
@@ -11,11 +12,11 @@ class Color:
     @classmethod
     def random(cls) -> "Color":
         return Color(
-                r=random.randint(0, 255),
-                g=random.randint(0, 255),
-                b=random.randint(0, 255),
-                a=random.randint(0, 255),
-                )
+            r=random.randint(0, 255),
+            g=random.randint(0, 255),
+            b=random.randint(0, 255),
+            a=random.randint(0, 255),
+        )
 
     def to_tuple(self) -> tuple[int, int, int, int]:
         """
@@ -36,10 +37,11 @@ class Color:
         0: BGRA
         1: ARGB
         """
-        if (cformat == 0):
+        if cformat == 0:
             return bytes([self.b, self.g, self.r, self.a])
         else:
             return bytes([self.a, self.r, self.g, self.b])
+
 
 class Colors(Color, Enum):
     # Basics

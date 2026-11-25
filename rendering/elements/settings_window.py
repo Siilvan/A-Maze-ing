@@ -5,6 +5,8 @@ from .text import CanvasText
 from .textbox import CanvasTextBox
 from .button import CanvasButton
 from .container import CanvasBoxContainer
+
+
 class CanvasSettings(CanvasElement):
     """
     Canvas element that displays the maze configuration as editable settings.
@@ -14,6 +16,7 @@ class CanvasSettings(CanvasElement):
     writes the edited values back to the file. All children are positioned
     relative to this element, so a parent container can move it freely.
     """
+
     def __init__(self, conf: MazeConfig, conf_path: str) -> None:
         super().__init__()
         self.conf_path = conf_path
@@ -64,5 +67,6 @@ class CanvasSettings(CanvasElement):
                 hbox.add_child(val_box)
                 self.settings_dict[setting] = val_box
         save_button = CanvasButton(
-            "Save settings?", self.save_settings, 30, Colors.GREEN)
+            "Save settings?", self.save_settings, 30, Colors.GREEN
+        )
         self.vbox.add_child(save_button)
