@@ -66,15 +66,11 @@ class MazeConfig:
         """
         if self.width < 2 or self.height < 2:
             raise MazeSizeException("Maze must be at least 2 wide and 2 high")
-        if (
-            not 0 <= self.entry_pos[0] < self.height
-            or not 0 <= self.entry_pos[1] < self.width
-        ):
+        if (not 0 <= self.entry_pos[1] < self.height
+            or not 0 <= self.entry_pos[0] < self.width):
             raise MazeGenerationException("Entry position outside of maze.")
-        if (
-            not 0 <= self.exit_pos[0] < self.height
-            or not 0 <= self.exit_pos[1] < self.width
-        ):
+        if (not 0 <= self.exit_pos[1] < self.height
+            or not 0 <= self.exit_pos[0] < self.width):
             raise MazeGenerationException("Exit position outside of maze")
 
         return True
