@@ -54,7 +54,8 @@ class CanvasSettings(CanvasElement):
         with open(self.conf_path, "w") as final:
             final.write(new_settings)
         self.get_rect()
-        self.parent.remove_child(self)
+        if (self.parent is not None):
+            self.parent.remove_child(self)
 
     def _initialize(self) -> None:
         self.add_child(self.vbox)

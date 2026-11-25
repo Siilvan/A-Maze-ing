@@ -61,16 +61,19 @@ class CanvasMainMenu(CanvasElement):
         self.curr_maze.set_new_grid(new_grid, self.window)
         self.curr_maze.conf = self.conf
         self.overlay.update_vars(self.curr_maze)
-        self.parent.dirty_tree()
+        if (self.parent is not None):
+            self.parent.dirty_tree()
 
-    def get_seed(self):
+    def get_seed(self) -> None:
         pass
 
-    def bonus(self):
+    def bonus(self) -> None:
         pass
 
-    def show_path(self):
+    def show_path(self) -> None:
         solution = self.gen.get_solution()
+        if (solution is None):
+            return None
         self.overlay.set_solution(self.curr_maze, solution)
         if self.overlay.show_solution:
             self.overlay.show_solution = False

@@ -86,10 +86,6 @@ def main() -> None:
     canvas.render_canvas()
     window.loop()
 
-# SETTINGS READ FROM CONF OBJECT INSTEAD WITH SMALL TRANSLATOR FOR ENTRY AND EXIT POS
-# MazeConfig.__vars__ USE THAT INSTEAD
-# CHANGE THE LOGO FOR ENCLOSED CELLS TO 0 (gaps in 8 and 9 for example)
-
 
 if __name__ == "__main__":
     main()
