@@ -81,7 +81,7 @@ class CanvasElement(ABC):
         return self.global_position - self.parent.global_position
 
     @position.setter
-    def position(self, p: Vector2):
+    def position(self, p: Vector2) -> None:
         if self.parent is not None:
             self.global_position = self.parent.global_position + p
         else:
@@ -90,8 +90,8 @@ class CanvasElement(ABC):
     def initialize(self, window: MlxWindow) -> None:
         if self._initialized:
             return Logger.get().w(
-                "Attempted to initialize an" +
-                "already initialized canvas element."
+                "Attempted to initialize an"
+                + "already initialized canvas element."
             )
         self.window = window
         self._initialized = True
@@ -226,7 +226,7 @@ class CanvasElement(ABC):
         """
         return
 
-    def add_child(self, child: "CanvasElement"):
+    def add_child(self, child: "CanvasElement") -> None:
         """
         Adds a child to this canvas element
         """
@@ -239,7 +239,7 @@ class CanvasElement(ABC):
         child.parent = self
         child.initialize(self.window)
 
-    def remove_child(self, child: "CanvasElement"):
+    def remove_child(self, child: "CanvasElement") -> None:
         """
         Removes a child to this canvas element
         """
@@ -278,7 +278,7 @@ class Canvas:
             self.window.mptr,
         )
 
-    def process_loop(self, _p: None):
+    def process_loop(self, _p: None) -> None:
         self.clear_canvas()
         self.render_canvas()
         # now = time.perf_counter()
@@ -291,7 +291,9 @@ class Canvas:
         for c in self.children:
             c.tick()
 
-    def _catch_mouse_press(self, button: int, x: int, y: int, _p: None):
+    def _catch_mouse_press(
+        self, button: int, x: int, y: int, _p: None
+    ) -> None:
         try:
             for c in self.children:
                 c.on_mouse_press(button, Vector2(x, y))
@@ -299,7 +301,7 @@ class Canvas:
             Logger.get().e(f"{e}")
             self.close_window(self.window.mptr)
 
-    def _catch_key_press(self, key: int, _p: None):
+    def _catch_key_press(self, key: int, _p: None) -> None:
         for c in self.children:
             c.on_key_press(key)
 
@@ -322,6 +324,6 @@ class Canvas:
         for c in self.children:
             c.clear()
 
-    def render_canvas(self, debug: bool = False):
+    def render_canvas(self, debug: bool = False) -> None:
         for c in self.children:
             c.draw(debug)

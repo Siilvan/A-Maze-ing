@@ -1,5 +1,10 @@
 EXECUTABLE=./a_maze_ing.py
 VENV_PYTHON=./.venv/bin/python3
+MYPY_FLAGS=--warn-return-any \
+		   --warn-unused-ignores \
+		   --ignore-missing-imports \
+		   --disallow-untyped-defs \
+		   --check-untyped-defs
 
 install:
 	python3 -m venv .venv
@@ -10,6 +15,19 @@ _check-install:
 		echo "\033[31mRun 'make install' first.\033[0m"; \
 		exit 1; \
 	fi
+
+_install-lint-tools:
+	@if ! $(VENV_PYTHON) -c 'import flake8' 1>/dev/null 2>&1; then \
+		echo '\033[33mFlake8 is not installed, installing it...\033[0m'; \
+		$(VENV_PYTHON) -m pip install flake8 1>/dev/null; \
+		echo "\033[32mDone!\033[0m"; \
+	fi
+	@if ! $(VENV_PYTHON) -c 'import mypy' 1>/dev/null 2>&1; then \
+		echo '\033[33mMypy is not installed, installing it...\033[0m'; \
+		$(VENV_PYTHON) -m pip install mypy 1>/dev/null; \
+		echo "\033[32mDone!\033[0m"; \
+	fi
+
 
 debug: _check-install
 	$(VENV_PYTHON) -m pdb $(EXECUTABLE)
@@ -24,22 +42,20 @@ run: _check-install
 	fi
 	@$(VENV_PYTHON) $(EXECUTABLE) $(CONF)
 
-lint: _check_install
-	@if ! $(VENV_PYTHON) -c 'import flake8' 1>/dev/null 2>&1; then \
-		echo '\033[33mFlake8 is not installed, installing it...\033[0m'; \
-		$(VENV_PYTHON) -m pip install flake8 1>/dev/null; \
-		echo "\033[32mDone!\033[0m"; \
-	fi
-	@if ! $(VENV_PYTHON) -c 'import mypy' 1>/dev/null 2>&1; then \
-		echo '\033[33mMypy is not installed, installing it...\033[0m'; \
-		$(VENV_PYTHON) -m pip install mypy 1>/dev/null; \
-		echo "\033[32mDone!\033[0m"; \
-	fi
+lint: _check_install _install-lint-tools
 	@echo "\n\033[34m==== Flake 8 ====\033[0m"
-	@-$(VENV_PYTHON) -m flake8 \
+	@-$(VENV_PYTHON) -m flake8 . \
 		&& echo "\033[32mflake8 outstandingly done!\033[0m";
 	@echo "\n\033[34m====  MY PY  ====\033[0m"
-	@-$(VENV_PYTHON) -m mypy . \
+	@-$(VENV_PYTHON) -m mypy . $(MYPY_FLAGS) \
+		&& echo "\033[32mmypy well done!\033[0m";
+
+lint-strict: _check_install _install-lint-tools
+	@echo "\n\033[34m==== Flake 8 ====\033[0m"
+	@-$(VENV_PYTHON) -m flake8 . \
+		&& echo "\033[32mflake8 outstandingly done!\033[0m";
+	@echo "\n\033[34m====  MY PY  ====\033[0m"
+	@-$(VENV_PYTHON) -m mypy --strict . \
 		&& echo "\033[32mmypy outstandingly done!\033[0m";
 
 clean:

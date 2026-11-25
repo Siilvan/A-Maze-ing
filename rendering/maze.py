@@ -25,6 +25,7 @@ class CanvasMaze(CanvasElement):
         cell_scale: float = CELL_SCALE,
         maze_solution: list[tuple[int, int]] | None = None,
     ) -> None:
+        self.maze_solution: list[Vector2] | None
         if maze_solution is not None:
             self.maze_solution = [Vector2.from_tuple(s) for s in maze_solution]
         else:
@@ -100,7 +101,8 @@ class CanvasMaze(CanvasElement):
             bg_padding=fill_padding,
         )
         if img is None:
-            return Logger.get().e("Failed to generate cell image.")
+            Logger.get().e("Failed to generate cell image.")
+            return None
         return img
 
     def _get_cell_image_path(self, cell: int, cell_pos: Vector2) -> str:

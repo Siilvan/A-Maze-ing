@@ -59,6 +59,7 @@ class DFSMazeGenerator(MazeGenerator):
                 or cell[1] < 0
             ):
                 return False
+
             if self.blocked[cell[1]][cell[0]]:
                 return False
             return True

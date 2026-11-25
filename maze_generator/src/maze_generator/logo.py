@@ -66,7 +66,7 @@ class Logos:
         self.logo = logo
         self.width = conf.width
         self.height = conf.height
-        self.full_logo: list[list[int]] = [
+        self.full_logo: list[list[bool]] = [
             [False for _ in range(self.width)] for _ in range(self.height)
         ]
 

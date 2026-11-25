@@ -46,6 +46,14 @@ def load_conf(conf_path: str) -> MazeConfig | None:
     return None
 
 
+class ConfigPath:
+    path: str
+
+    @classmethod
+    def set_path(cls, path: str) -> None:
+        cls.path = path
+
+
 def main() -> None:
     conf: MazeConfig | None = None
     if len(sys.argv) < 2:

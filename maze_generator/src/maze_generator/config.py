@@ -29,7 +29,7 @@ class MazeConfig:
         self.expected_types: dict[str, type] = {
             "exit_pos": tuple,
             "entry_pos": tuple,
-            "output_pvaiath": str,
+            "output_path": str,
             "perfect": bool,
             "width": int,
             "height": int,
@@ -99,9 +99,9 @@ class MazeConfig:
                 key, val = config._parse_line(line, line_n)
                 if not config._assign_key(key, val):
                     raise MazeConfig.ParseError(
-                        msg=f'Failed to assign \033[32m"{val}"\033[0m to' +
-                        f'\033[33m{key}\033[0m, ' +
-                        "ensure the type and naming are correct.",
+                        msg=f'Failed to assign \033[32m"{val}"\033[0m to'
+                        + f"\033[33m{key}\033[0m, "
+                        + "ensure the type and naming are correct.",
                         line_n=line_n,
                         line=line,
                     )
@@ -134,7 +134,7 @@ class MazeConfig:
         if comment_pos < 0:
             val = line[eq_pos + 1:]
         else:
-            val = line[eq_pos + 1: comment_pos]
+            val = line[eq_pos + 1:comment_pos]
         return (key, val)
 
     def _assign_key(self, key: str, val: Any) -> bool:
@@ -158,7 +158,7 @@ class MazeConfig:
         return False
 
     def __str__(self) -> str:
-        return "\n".join([f"{k}={v}" for k, v in self.__dict__])
+        return "\n".join([f"{k}={v}" for k, v in self.__dict__.items()])
 
     def __repr__(self) -> str:
         return str(self)

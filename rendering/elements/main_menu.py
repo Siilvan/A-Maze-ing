@@ -27,20 +27,20 @@ class CanvasMainMenu(CanvasElement):
         self.rect = self.get_rect()
         super()._draw()
 
-    def settings(self):
+    def settings(self) -> None:
         pass
 
-    def regenerate(self):
+    def regenerate(self) -> None:
         new_gen = RowByRowMazeGenerator(self.conf)
         new_gen.generate_maze()
         new_grid = new_gen.get_maze()
         self.curr_maze.dirty = True
         self.curr_maze.grid = new_grid
 
-    def get_seed(self):
+    def get_seed(self) -> None:
         pass
 
-    def bonus(self):
+    def bonus(self) -> None:
         pass
 
     @override

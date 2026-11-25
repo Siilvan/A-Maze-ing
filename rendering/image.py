@@ -102,14 +102,14 @@ class MlxImage:
         """
         mlx.mlx_destroy_image(mptr, self.pointer)
 
-    def set_pixel(self, x: int, y: int, color: Color):
+    def set_pixel(self, x: int, y: int, color: Color) -> None:
         """
         Sets the pixel at pos x, y of an image
         """
         offset = y * self.sizeline + x * (self.bppixels // 8)
         self.pixels[offset:offset + 4] = color.to_bytes(cformat=self.iformat)
 
-    def clear_image(self, color: Color = Colors.BLACK):
+    def clear_image(self, color: Color = Colors.BLACK) -> None:
         """
         Sets all the pixels of an image to one color
         """
