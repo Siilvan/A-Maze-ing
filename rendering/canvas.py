@@ -124,7 +124,6 @@ class CanvasElement(ABC):
             c.clear()
         if not self.dirty:
             return
-        Logger.get().i(f"clearing {type(self).__name__}")
         image: MlxImage = MlxImage.new_image(self.window.mlx,
                                              self.window.mptr,
                                              self.rect.size.x,

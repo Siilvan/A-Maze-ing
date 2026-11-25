@@ -22,13 +22,8 @@ class CanvasSettings(CanvasElement):
         self.vbox = CanvasBoxContainer(10, 0, True)
 
     def get_rect(self) -> Rect:
-        # !!!!! IF SETTINGS WINDOW IS NOT CLEARING PROPERLY UNCOMMENT THE LINES BELOW
-        # AND COMMENT THE OTHER RETURN, I DONt KNOW WHY THIS WORKS AND IT DOESNT MATTER
-        # WE'LL JUST HAVE TO BE FINE WITH THE CLEARING WHEN OYU FIRST OPEN THE SETTINGS
-
-        # self.rect =  self.vbox.get_rect()
-        # return self.rect
-        return self.vbox.get_rect()
+        self.rect =  self.vbox.get_rect()
+        return self.rect
 
     def _draw(self) -> None:
         self.rect = self.get_rect()
@@ -55,7 +50,6 @@ class CanvasSettings(CanvasElement):
             new_settings = old_settings
         with open(self.conf_path, "w") as final:
             final.write(new_settings)
-        self.rect = self.get_rect()
         self.parent.remove_child(self)
 
     def _initialize(self) -> None:

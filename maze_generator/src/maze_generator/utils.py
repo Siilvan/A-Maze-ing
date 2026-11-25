@@ -57,11 +57,11 @@ def solution_to_directions(solution: list[tuple[int, int]]) -> str | None:
         direction: tuple[int, int] = tuple_op(c, previous, lambda a, b: a - b)
         match direction:
             case (0, 1):
-                string += "N"
+                string += "S"
             case (1, 0):
                 string += "E"
             case (0, -1):
-                string += "S"
+                string += "N"
             case (-1, 0):
                 string += "W"
             case _:
