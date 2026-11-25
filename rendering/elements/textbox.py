@@ -89,7 +89,7 @@ class CanvasTextBox(CanvasElement):
             self.shift_held = True
             return
         if not self.focused:
-            return   
+            return
         if button == 65293:
             self.focused = False
         elif button == 65288:

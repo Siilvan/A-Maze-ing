@@ -25,7 +25,7 @@ class CanvasSettings(CanvasElement):
         self.vbox = CanvasBoxContainer(10, 0, True)
 
     def get_rect(self) -> Rect:
-        self.rect =  self.vbox.get_rect()
+        self.rect = self.vbox.get_rect()
         return self.rect
 
     def _draw(self) -> None:
@@ -53,12 +53,15 @@ class CanvasSettings(CanvasElement):
             new_settings = old_settings
         with open(self.conf_path, "w") as final:
             final.write(new_settings)
+        self.get_rect()
         self.parent.remove_child(self)
 
     def _initialize(self) -> None:
         self.add_child(self.vbox)
         with open(self.conf_path, "r") as conf_file:
             for line in conf_file:
+                if line.startswith("\n") or line.startswith("#"):
+                    continue
                 line = line.strip("\n")
                 setting, setting_val = line.split("=")
                 hbox = CanvasBoxContainer(10, 0, False)

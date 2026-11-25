@@ -1,4 +1,4 @@
-from ..canvas import CanvasElement, Rect, Canvas
+from ..canvas import CanvasElement, Rect
 from ..colors import Colors
 from ..maze import CanvasMaze
 from .container import CanvasBoxContainer
@@ -6,7 +6,6 @@ from .button import CanvasButton
 from .maze_overlay import MazeOverlay
 from maze_generator import RowByRowMazeGenerator, MazeConfig, Logger
 from .settings_window import CanvasSettings
-from typing import override
 
 
 class CanvasMainMenu(CanvasElement):
@@ -59,12 +58,9 @@ class CanvasMainMenu(CanvasElement):
         new_gen.generate_maze()
         new_gen.write_grid_to_file()
         new_grid = new_gen.get_maze()
-        solution: list[tuple[int, int]] | None = new_gen.get_solution()
-        if (solution is None):
-            Logger.get().e("Failed to solve maze.")
         self.curr_maze.set_new_grid(new_grid, self.window)
         self.curr_maze.conf = self.conf
-        self.curr_maze.set_new_solution(solution)
+        self.overlay.update_vars(self.curr_maze)
         self.parent.dirty_tree()
 
     def get_seed(self):

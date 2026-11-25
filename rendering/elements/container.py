@@ -41,9 +41,3 @@ class CanvasBoxContainer(CanvasElement):
 
     def _pre_draw(self) -> None:
         self._layout()
-
-    # @override
-    # def _draw(self) -> None:
-    #     self._layout()
-    #     for c in self.children:
-    #         c.draw()

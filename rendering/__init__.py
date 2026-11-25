@@ -11,6 +11,7 @@ from .elements import (
     CanvasButton,
     CanvasTextBox,
     CanvasMainMenu,
+    MazeOverlay
 )
 
 __all__ = [
@@ -27,4 +28,5 @@ __all__ = [
     "CanvasButton",
     "CanvasTextBox",
     "CanvasMainMenu",
+    "MazeOverlay"
 ]

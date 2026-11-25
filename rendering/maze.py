@@ -9,9 +9,11 @@ from rendering.canvas import CanvasElement, Rect
 from maze_generator import Logger, MazeConfig
 from rendering.colors import Color
 from rendering.image import MlxImage
+from rendering.window import MlxWindow
 from rendering.vector import Vector2
 
 CELL_SIZE = 50
+REAL_CELL_SIZE = 70
 CELL_SCALE = 1.5
 IMG_DIR = Path(__file__).resolve().parent / "./static/images/forest"
 
@@ -20,22 +22,18 @@ class CanvasMaze(CanvasElement):
     def __init__(self, grid: list[list[int]],
                  maze_config: MazeConfig,
                  window: MlxWindow,
-                 maze_solution: list[tuple[int, int]] | None = None
                  ) -> None:
-        if (maze_solution is not None):
-            self.set_new_solution(maze_solution)
-        else:
-            self.maze_solution = None
         self.conf = maze_config
         self.set_new_grid(grid, window)
         self.image_cache: dict[int, MlxImage] = {}
         super().__init__()
 
     def get_rect(self) -> Rect:
+        rows, cols = len(self.grid), len(self.grid[0])
         self.rect = Rect(
             Vector2(
-                self.cell_size[1] * len(self.grid[0]),
-                self.cell_size[0] * len(self.grid),
+                self.cell_size[0] * (cols - 1) + self.image_side,
+                self.cell_size[0] * (rows - 1) + self.image_side,
             ),
             self.global_position,
         )
@@ -79,13 +77,10 @@ class CanvasMaze(CanvasElement):
         elif cell_pos == Vector2.from_tuple(self.conf.exit_pos):
             fill_color = Colors.LIME
             fill_padding = round(self.cell_size[0] / 2)
-        # elif (self.maze_solution is not None):
-        #     if (cell_pos in self.maze_solution):
-        #         fill_color = Colors.RED
-        #         fill_padding = round(self.cell_size[0] / 1.7)
-        img: MlxImage | None = MlxImage.from_image(self.window.mlx, self.window.mptr,
-                                                   path, scale=self.cell_scale, bg=fill_color,
-                                                   bg_padding=fill_padding)
+        img: MlxImage | None = MlxImage.from_image(
+            self.window.mlx, self.window.mptr,
+            path, scale=self.cell_scale, bg=fill_color,
+            bg_padding=fill_padding)
         if (img is None):
             return Logger.get().e("Failed to generate cell image.")
         return img
@@ -97,8 +92,7 @@ class CanvasMaze(CanvasElement):
         if cell == 0:
             return str(IMG_DIR / "empty.png")
         if (cell == N + E + S + W):
-            return str(IMG_DIR / f"north_east_south_west_2.png")
-            return str(IMG_DIR / f"full_{random.randint(1, 6)}.png")
+            return str(IMG_DIR / "north_east_south_west_2.png")
         path: list[str] = []
         if cell & N:
             path.append("north")
@@ -113,18 +107,18 @@ class CanvasMaze(CanvasElement):
 
         return str(IMG_DIR / f"{'_'.join(path)}_{random.randint(1, 7)}.png")
 
-    def set_new_solution(self, solution: list[tuple[int, int]]) -> None:
-        self.maze_solution = [Vector2.from_tuple(s) for s in solution]
-
     def set_new_grid(self, grid: list[list[int]], window: MlxWindow) -> None:
         self.grid = grid
         maze_space = Vector2(window.width - 700, window.height - 200)
         rows, cols = len(grid), len(grid[0])
-        scale = min(maze_space.x / (CELL_SIZE * cols),
-                    maze_space.y / (CELL_SIZE * rows))
+        scale = min(
+            maze_space.x / (CELL_SIZE * (cols - 1) + REAL_CELL_SIZE),
+            maze_space.y / (CELL_SIZE * (rows - 1) + REAL_CELL_SIZE)
+            )
         side = round(CELL_SIZE * scale)
         self.cell_scale = scale
         self.cell_size = (side, side)
+        self.image_side = round(REAL_CELL_SIZE * scale)
 
 
 if __name__ == "__main__":
