@@ -1,8 +1,10 @@
 from ..canvas import CanvasElement, Vector2, Rect
-from typing import override
+
 
 class CanvasBoxContainer(CanvasElement):
-    def __init__(self, spacing: int = 10, padding: int = 100, vertical: bool = False) -> None:
+    def __init__(
+        self, spacing: int = 10, padding: int = 100, vertical: bool = False
+    ) -> None:
         self.vertical = vertical
         self.padding = padding
         self.spacing = spacing

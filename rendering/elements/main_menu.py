@@ -8,6 +8,7 @@ from maze_generator import RowByRowMazeGenerator, MazeConfig, Logger
 from .settings_window import CanvasSettings
 from typing import override
 
+
 class CanvasMainMenu(CanvasElement):
     def __init__(self, conf: MazeConfig,
                  conf_path: str,

@@ -10,13 +10,25 @@ from rendering import (
     CanvasMaze, CanvasMainMenu, MlxWindow, Canvas, Colors,
     CanvasBoxContainer, Vector2
 )
+from rendering import (
+    Canvas,
+    Colors,
+    CanvasMaze,
+    CanvasSettings,
+    MlxWindow,
+    CanvasBoxContainer,
+    Vector2,
+    CanvasText,
+    CanvasMainMenu,
+)
+
 
 from rendering.elements.maze_overlay import MazeOverlay
 
 def load_conf(conf_path: str) -> MazeConfig | None:
     """
     Attempts to load the conf specified by `conf_path`
-    returns None on failure. 
+    returns None on failure.
     If the specified path does not point to a file, returns a default config.
     """
     p = Path(conf_path)
@@ -38,6 +50,7 @@ def load_conf(conf_path: str) -> MazeConfig | None:
     except ManualExit as e:
         Logger.get().e(f"{e}")
     return None
+
 
 def main() -> None:
     conf: MazeConfig | None = None

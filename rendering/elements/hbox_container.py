@@ -18,7 +18,7 @@ class CanvasHBoxContainer(CanvasElement):
         height: int = self.padding
         for i, c in enumerate(self.children):
             c.position = Vector2(width, self.padding)
-            if (i != 0 and i < len(self.children)):
+            if i != 0 and i < len(self.children):
                 c.position = Vector2(c.position.x + self.spacing, c.position.y)
                 width += self.spacing
             rect: Rect = c.get_rect()
@@ -35,7 +35,7 @@ class CanvasHBoxContainer(CanvasElement):
         height: int = self.padding
         for i, c in enumerate(self.children):
             c.position = Vector2(width, self.padding)
-            if (i != 0 and i < len(self.children)):
+            if i != 0 and i < len(self.children):
                 c.position = Vector2(c.position.x + self.spacing, c.position.y)
                 width += self.spacing
             c.draw()

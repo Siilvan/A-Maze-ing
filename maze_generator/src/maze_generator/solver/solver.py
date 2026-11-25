@@ -6,11 +6,11 @@ DIRS: dict[int, tuple[str, int, int]] = {
     0: ("N", -1, 0),
     1: ("E", 0, 1),
     2: ("S", 1, 0),
-    3: ("W", 0, -1)
-    }
+    3: ("W", 0, -1),
+}
 
 
-class SolverBot():
+class SolverBot:
     """
     Finds a path through a finished maze from the entry to the exit.
 
@@ -22,6 +22,7 @@ class SolverBot():
     Paths are lists of (row, col) cells, starting at the entry and
     ending at the exit.
     """
+
     def __init__(self, grid: list[list[int]], conf: MazeConfig) -> None:
         """
         Saves the maze grid, the entry and exit cells from the config,
@@ -47,7 +48,7 @@ class SolverBot():
         else:
             self._slow_solve()
             result = min(self.paths, key=len) if self.paths else None
-        if (result is not None):
+        if result is not None:
             return [(t[1], t[0]) for t in result]
         return None
 
@@ -103,9 +104,11 @@ class SolverBot():
         self.paths = []
         best_path: dict[tuple[int, int], int] = {}
         with concurrent.futures.ProcessPoolExecutor() as executor:
-            futures = {executor.submit(
-                self.walk_path, self.entry, coords=[self.entry])
-                }
+            futures = {
+                executor.submit(
+                    self.walk_path, self.entry, coords=[self.entry]
+                )
+            }
 
             while futures:
                 done, futures = concurrent.futures.wait(
@@ -125,15 +128,15 @@ class SolverBot():
                         futures.add(
                             executor.submit(
                                 self.walk_path, junction, coords, path
-                                )
                             )
+                        )
 
     def walk_path(
-            
-            self, pos: tuple[int, int],
-            coords: list[tuple[int, int]] = [],
-            s_move: int | None = None
-            ) -> tuple[bool, list[int], list[tuple[int, int]]]:
+        self,
+        pos: tuple[int, int],
+        coords: list[tuple[int, int]] = [],
+        s_move: int | None = None,
+    ) -> tuple[bool, list[int], list[tuple[int, int]]]:
         """
         Follows a corridor forward until something interesting happens.
 
@@ -169,15 +172,16 @@ class SolverBot():
         return (False, paths, coord_list)
 
     def update_vars(
-            self, curr_pos: tuple[int, int],
-            coord_list: list[tuple[int, int]],
-            move: int
-            ) -> tuple[tuple[int, int], list[int]]:
+        self,
+        curr_pos: tuple[int, int],
+        coord_list: list[tuple[int, int]],
+        move: int,
+    ) -> tuple[tuple[int, int], list[int]]:
         """
         Takes one step in the given direction.
 
-        Adds the new cell to coord_list and looks up where you can go from there, without going back the
-        way you came.
+        Adds the new cell to coord_list and looks up where
+        you can go from there, without going back the way you came.
 
         Returns the new position and the list of directions open from it.
         """
@@ -199,9 +203,12 @@ class SolverBot():
         """
         cell_val = self.grid[pos[0]][pos[1]]
         ignore = 42
-        for key, val, in DIRS.items():
+        for (
+            key,
+            val,
+        ) in DIRS.items():
             if val[0] == dir:
-                ignore = ((key + 2) % 4)
+                ignore = (key + 2) % 4
         positions = []
         position = 0
         while position < 4:
