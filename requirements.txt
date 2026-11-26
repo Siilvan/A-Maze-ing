@@ -1,3 +1,3 @@
--e ./maze_generator
+./maze_generator
 ./libs/mlx/ubuntu/mlx-2.2-py3-none-any.whl
 pillow==13.0.0

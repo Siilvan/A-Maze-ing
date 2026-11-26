@@ -68,10 +68,10 @@ def solution_to_directions(solution: list[tuple[int, int]]) -> str | None:
                 string += "W"
             case _:
                 Logger.get().e(
-                    "Got unknown direction while " +
-                    f"parsing solution: {direction}"
+                    "Got unknown direction while "
+                    + f"parsing solution: {direction}"
                 )
-                return
+                return None
         previous = c
     return string
 

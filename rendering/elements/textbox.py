@@ -84,7 +84,7 @@ class CanvasTextBox(CanvasElement):
         im.save(im_path)
         return MlxImage.from_image(self.window.mlx, self.window.mptr, im_path)
 
-    def key_press(self, button: int, fil=None):
+    def key_press(self, button: int, fil: None = None) -> None:
         if button in (65505, 65506):
             self.shift_held = True
             return
@@ -103,11 +103,11 @@ class CanvasTextBox(CanvasElement):
             self.text += char
             self.dirty = True
 
-    def key_release(self, button: int, fil=None):
+    def key_release(self, button: int, fil: None = None) -> None:
         if button in (65505, 65506):
             self.shift_held = False
 
-    def _on_mouse_press(self, button, pos):
+    def _on_mouse_press(self, button: int, pos: Vector2) -> None:
         self.focused = self.rect.has_point(pos)
         if self.focused:
             self.window.mlx.mlx_hook(

@@ -11,15 +11,15 @@ IMG_DIR = Path(__file__).resolve().parent / "../static/images/forest"
 
 class MazeOverlay(CanvasElement):
     def __init__(
-            self, maze: CanvasMaze,
-            solution: list[tuple[int, int]]
+            self,
+            maze: CanvasMaze,
+            solution: list[tuple[int, int]] | None
             ) -> None:
         super().__init__()
         self.show_solution = False
         self._trail: MlxImage | None = None
         self.update_vars(maze)
         self.set_solution(maze, solution)
-        self._trail: MlxImage | None = None
 
     def update_vars(self, maze: CanvasMaze) -> None:
         new_scale = maze.cell_scale
@@ -56,20 +56,27 @@ class MazeOverlay(CanvasElement):
 
     def set_solution(self,
                      maze: CanvasMaze,
-                     solution: list[tuple[int, int]]
-                     ) -> None:
+                     solution: list[tuple[int, int]] | None) -> None:
         self.update_vars(maze)
-        self.solution = [Vector2.from_tuple(c) for c in solution]
+        self.solution: list[Vector2] | None = None
+        if (solution is not None):
+            self.solution = [
+                    Vector2.from_tuple(c) for c in solution
+                    ]
 
     def draw_solution(self) -> None:
+        if (self.solution is None):
+            return None
         marker = self._get_trail()
+        if (marker is None):
+            return None
         for step in self.solution[1:-1]:
             pos = Vector2(
                 (step.x * self.cell_size[0]) + self.global_position.x,
                 (step.y * self.cell_size[1]) + self.global_position.y)
             self.window.put_image(marker, pos.x, pos.y)
 
-    def _draw(self):
+    def _draw(self) -> None:
         self.get_rect()
         if self.show_solution:
             self.draw_solution()
@@ -78,12 +85,14 @@ class MazeOverlay(CanvasElement):
 
     @override
     def clear(self) -> None:
-        if not self.dirty:
+        if not self.dirty or self.solution is None:
             return
         clear = MlxImage.from_image(
             self.window.mlx, self.window.mptr,
             str(IMG_DIR / "empty.png"), self.scale,
             self.window.bg, round(self.side / 1.8))
+        if (clear is None):
+            return
         for step in self.solution[1:-1]:
             pos = Vector2(
                 (step.x * self.cell_size[0]) + self.global_position.x,

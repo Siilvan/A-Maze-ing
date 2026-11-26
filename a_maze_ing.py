@@ -38,6 +38,14 @@ def load_conf(conf_path: str) -> MazeConfig | None:
     return None
 
 
+class ConfigPath:
+    path: str
+
+    @classmethod
+    def set_path(cls, path: str) -> None:
+        cls.path = path
+
+
 def main() -> None:
     conf: MazeConfig | None = None
     try:
@@ -77,10 +85,6 @@ def main() -> None:
     print(maze.rect)
     canvas.render_canvas()
     window.loop()
-
-# SETTINGS READ FROM CONF OBJECT INSTEAD WITH SMALL TRANSLATOR FOR ENTRY AND EXIT POS
-# MazeConfig.__vars__ USE THAT INSTEAD
-# CHANGE THE LOGO FOR ENCLOSED CELLS TO 0 (gaps in 8 and 9 for example)
 
 
 if __name__ == "__main__":

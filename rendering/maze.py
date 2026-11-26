@@ -82,7 +82,8 @@ class CanvasMaze(CanvasElement):
             path, scale=self.cell_scale, bg=fill_color,
             bg_padding=fill_padding)
         if (img is None):
-            return Logger.get().e("Failed to generate cell image.")
+            Logger.get().e("Failed to generate cell image.")
+            return None
         return img
 
     def _get_cell_image_path(self, cell: int, cell_pos: Vector2) -> str:
