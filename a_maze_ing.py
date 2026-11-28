@@ -7,7 +7,7 @@ from maze_generator import (
     Logger)
 from rendering import (
     CanvasMaze, CanvasMainMenu, MlxWindow, Canvas, Colors,
-    CanvasBoxContainer, MazeOverlay
+    CanvasContainer, PathOverlay
 )
 
 
@@ -69,14 +69,14 @@ def main() -> None:
     window: MlxWindow = MlxWindow()
     window.init_window((2560, 1440), Colors.DARK_GRAY, "A-Maze-Ing!")
     canvas: Canvas = Canvas(window)
-    container = CanvasBoxContainer(100, 100)
+    container = CanvasContainer(100, 100)
     canvas.add_child(container)
     solution: list[tuple[int, int]] | None = generator.get_solution()
     if (solution is None):
         Logger.get().e("Failed to solve maze.")
 
     maze: CanvasMaze = CanvasMaze(grid, conf, window)
-    overlay = MazeOverlay(maze, solution)
+    overlay = PathOverlay(maze, solution)
     menu = CanvasMainMenu(conf, conf_path, maze, generator, overlay)
     container.add_child(maze)
     container.add_child(menu)

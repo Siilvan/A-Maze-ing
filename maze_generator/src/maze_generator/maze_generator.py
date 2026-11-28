@@ -30,8 +30,8 @@ class MazeGenerator(ABC):
         self.height = conf.height
         self.perfect = conf.perfect
         self.generated: bool = False
-        logo = Logos(conf.logo.strip("\n"), conf)
-        self.blocked = logo.make_logo()
+        self.logo = Logos(conf.logo.strip("\n"), conf)
+        self.blocked = self.logo.make_logo()
 
     def remove_wall_between(
         self, cell_a: tuple[int, int], cell_b: tuple[int, int]
@@ -455,7 +455,7 @@ class RowByRowMazeGenerator(MazeGenerator):
                 if (
                     cell == forced
                     or dead_pocket_below
-                    or random.random() < 0.4
+                    or random.random() < 0.42
                 ):
                     row[cell] &= ~S
 

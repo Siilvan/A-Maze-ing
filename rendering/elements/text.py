@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import override
+from functools import lru_cache
 
 from PIL import Image, ImageDraw, ImageFont
 
@@ -10,11 +11,22 @@ from rendering.image import MlxImage
 from rendering.vector import Vector2
 
 logger = Logger.get()
+FONT_PATH = Path(__file__).resolve().parent / "../static/fonts/rainyhearts.ttf"
+
+
+@lru_cache(maxsize=None)
+def get_font(size: int) -> ImageFont.FreeTypeFont:
+    return ImageFont.truetype(FONT_PATH, size)
+
+
+@lru_cache(maxsize=4096)
+def measure_text(string: str, size: int) -> tuple[int, int]:
+    font = get_font(size)
+    ascent, descent = font.getmetrics()
+    return max(1, round(font.getlength(string))), ascent + descent
 
 
 class CanvasText(CanvasElement):
-    FONT_DIR: Path = Path(__file__).resolve().parent / "../static/fonts/"
-
     def __init__(
         self, text: str, font_size: int = 12, color: Color = Colors.BLACK
     ) -> None:
@@ -24,13 +36,8 @@ class CanvasText(CanvasElement):
         super().__init__()
 
     def get_rect(self) -> Rect:
-        image: MlxImage | None = self._get_string_image(self.text)
-        if image is None:
-            logger.e(f"Failed to generate image for string '{self.text}'")
-            raise RuntimeError
-        self.rect = Rect(
-            Vector2(image.width, image.height), self.global_position
-        )
+        width, height = measure_text(self.text, self.font_size)
+        self.rect = Rect(Vector2(width, height), self.global_position)
         return self.rect
 
     @override
@@ -39,21 +46,15 @@ class CanvasText(CanvasElement):
         if image is None:
             logger.e(f"Failed to generate image for string '{self.text}'")
             return
-        self.rect = Rect(
-            Vector2(image.width, image.height), self.global_position
-        )
+        self.get_rect()
         self.window.put_image(
             image, self.global_position.x, self.global_position.y
         )
 
     def _get_string_image(self, string: str) -> MlxImage | None:
-        font: ImageFont.FreeTypeFont = ImageFont.truetype(
-            CanvasText.FONT_DIR / "Roboto-Regular.ttf", self.font_size
-        )
-        ascent, descent = font.getmetrics()
-        height: int = ascent + descent
-        advance: float = font.getlength(string)
-        width: int = max(1, round(advance))
+        font = get_font(self.font_size)
+        width, height = measure_text(string, self.font_size)
+        ascent, _ = font.getmetrics()
         im = Image.new("RGBA", (width, height), (0, 0, 0, 0))
         draw = ImageDraw.Draw(im)
         draw.text(

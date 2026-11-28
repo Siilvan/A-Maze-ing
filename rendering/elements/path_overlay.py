@@ -9,11 +9,11 @@ from ..window import MlxImage
 IMG_DIR = Path(__file__).resolve().parent / "../static/images/forest"
 
 
-class MazeOverlay(CanvasElement):
+class PathOverlay(CanvasElement):
     def __init__(
             self,
             maze: CanvasMaze,
-            solution: list[tuple[int, int]] | None
+            solution: list[tuple[int, int]] | None = None
             ) -> None:
         super().__init__()
         self.show_solution = False
@@ -54,9 +54,11 @@ class MazeOverlay(CanvasElement):
         self.rect = Rect(size, self.global_position)
         return self.rect
 
-    def set_solution(self,
-                     maze: CanvasMaze,
-                     solution: list[tuple[int, int]] | None) -> None:
+    def set_solution(
+            self,
+            maze: CanvasMaze,
+            solution: list[tuple[int, int]] | None
+            ) -> None:
         self.update_vars(maze)
         self.solution: list[Vector2] | None = None
         if (solution is not None):

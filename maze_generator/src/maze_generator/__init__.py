@@ -1,4 +1,5 @@
 from .config import MazeConfig
+from .logo import Logos
 from .maze_generator import RowByRowMazeGenerator
 from .dfs_generator import DFSMazeGenerator
 from .solver import SolverBot
@@ -19,4 +20,6 @@ __all__ = [
     "ManualExit",
     "CharNotFound",
     "Logger",
+    "DFSMazeGenerator",
+    "Logos"
 ]

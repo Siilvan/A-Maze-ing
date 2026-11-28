@@ -1,13 +1,12 @@
 from pathlib import Path
 from typing import override
 from typing import Callable
-from PIL import Image, ImageDraw, ImageFont
 
 from maze_generator import Logger
 from rendering.canvas import CanvasElement, Rect
 from rendering.colors import Color, Colors
-from ..image import MlxImage
-from . import CanvasText
+from .text import CanvasText
+from .container import CanvasContainer
 from rendering.vector import Vector2
 
 logger = Logger.get()
@@ -27,53 +26,37 @@ class CanvasButton(CanvasElement):
         self.callback = callback
         self.font_size = font_size
         self.color = color
+        self.container = CanvasContainer(30, 0, False)
         super().__init__()
+
+    def get_rect(self) -> Rect:
+        self.rect = self.container.get_rect()
+        return self.rect
 
     @override
     def _draw(self) -> None:
-        image: MlxImage | None = self._get_string_image(self.text)
-        if image is None:
-            logger.e(f"Failed to generate image for string '{self.text}'")
-            return
-        self.rect = Rect(
-            Vector2(image.width, image.height), self.global_position
-        )
-        self.window.put_image(
-            image, self.global_position.x, self.global_position.y
-        )
-        return super()._draw()
+        self.rect = self.get_rect()
+        super()._draw()
 
-    def get_rect(self) -> Rect:
-        image: MlxImage | None = self._get_string_image(self.text)
-        if image is None:
-            logger.e(f"Failed to generate image for string '{self.text}'")
-            raise RuntimeError
-        self.rect = Rect(
-            Vector2(image.width, image.height), self.global_position
-        )
-        return self.rect
-
-    def _get_string_image(self, string: str) -> MlxImage | None:
-        font: ImageFont.FreeTypeFont = ImageFont.truetype(
-            CanvasText.FONT_DIR / "Roboto-Regular.ttf", self.font_size
-        )
-        ascent, descent = font.getmetrics()
-        height: int = ascent + descent
-        advance: float = font.getlength(string)
-        width: int = max(1, round(advance))
-        im = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-        draw = ImageDraw.Draw(im)
-        draw.text(
-            (0, ascent - font.getbbox(string)[3]),
-            string,
-            font=font,
-            fill=self.color.to_tuple(),
-        )
-        im_path: str = "/tmp/PILtemp.png"
-        im.save(im_path)
-        return MlxImage.from_image(self.window.mlx, self.window.mptr, im_path)
+    def _initialize(self) -> None:
+        self.add_child(self.container)
+        self.hover_arrow = CanvasText("<", self.font_size, self.window.bg)
+        self.container.add_child(
+            CanvasText(self.text, self.font_size, self.color)
+            )
+        self.container.add_child(self.hover_arrow)
 
     @override
     def _on_mouse_press(self, button: int, pos: Vector2) -> None:
         if button == 1 and self.is_hovering(pos):
             self.callback()
+
+    @override
+    def _on_hover_enter(self):
+        self.hover_arrow.color = self.color
+        self.hover_arrow.dirty = True
+
+    @override
+    def _on_hover_exit(self):
+        self.hover_arrow.color = self.window.bg
+        self.hover_arrow.dirty = True

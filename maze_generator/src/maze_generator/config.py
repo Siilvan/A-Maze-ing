@@ -19,8 +19,8 @@ class MazeConfig:
         entry_pos: tuple[int, int] = (0, 0),
         output_path: str = "output.mz",
         perfect: bool = False,
-        width: int = 50,
-        height: int = 50,
+        width: int = 10,
+        height: int = 10,
         logo: str = "42",
         seed: int | None = None,
     ) -> None:
@@ -61,8 +61,6 @@ class MazeConfig:
         """
         Validates the config and it's current parameters.
         ensures everything is how it should be.
-
-        returns True or False if the config is correct or not
         """
         if self.width < 2 or self.height < 2:
             raise MazeSizeException("Maze must be at least 2 wide and 2 high")
@@ -72,7 +70,9 @@ class MazeConfig:
         if (not 0 <= self.exit_pos[1] < self.height or
                 not 0 <= self.exit_pos[0] < self.width):
             raise MazeGenerationException("Exit position outside of maze")
-        return True
+        if (self.exit_pos == self.entry_pos):
+            raise MazeGenerationException(
+                "Entry and exit are on the same position")
 
     @classmethod
     def from_file(cls, path: str) -> "MazeConfig":
@@ -95,7 +95,7 @@ class MazeConfig:
                 if not config._assign_key(key, val):
                     raise MazeConfig.ParseError(
                         msg=f'Failed to assign \033[32m"{val}"\033[0m to'
-                        + f"\033[33m{key}\033[0m, "
+                        + f" \033[33m{key}\033[0m, "
                         + "ensure the type and naming are correct.",
                         line_n=line_n,
                         line=line,
@@ -142,6 +142,9 @@ class MazeConfig:
         # Ensure that this object has an attribute with the keyname
         if hasattr(self, key):
             parsed: Any = try_parse(val, self.expected_types[key])
+            if key == "seed" and val.lower() == "none":
+                setattr(self, key, None)
+                return True
             if parsed is None:
                 return False
             setattr(self, key, parsed)

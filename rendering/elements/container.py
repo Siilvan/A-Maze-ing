@@ -1,7 +1,7 @@
 from ..canvas import CanvasElement, Vector2, Rect
 
 
-class CanvasBoxContainer(CanvasElement):
+class CanvasContainer(CanvasElement):
     def __init__(
         self, spacing: int = 10, padding: int = 100, vertical: bool = False
     ) -> None:

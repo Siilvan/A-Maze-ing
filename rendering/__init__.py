@@ -4,14 +4,15 @@ from .vector import Vector2
 from .colors import Colors
 
 from .elements import (
-    CanvasBoxContainer,
+    CanvasContainer,
     CanvasSettings,
     CanvasText,
     CanvasMaze,
     CanvasButton,
     CanvasTextBox,
     CanvasMainMenu,
-    MazeOverlay
+    PathOverlay,
+    GameOverlay
 )
 
 __all__ = [
@@ -21,12 +22,13 @@ __all__ = [
     "CanvasElement",
     "Vector2",
     "Colors",
-    "CanvasBoxContainer",
+    "CanvasContainer",
     "CanvasSettings",
     "CanvasText",
     "CanvasMaze",
     "CanvasButton",
     "CanvasTextBox",
     "CanvasMainMenu",
-    "MazeOverlay"
+    "PathOverlay",
+    "GameOverlay"
 ]

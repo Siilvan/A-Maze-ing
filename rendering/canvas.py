@@ -49,6 +49,7 @@ class CanvasElement(ABC):
         self._global_position: Vector2 = Vector2(0, 0)
         self.rect: Rect = Rect.empty()
         self.children: list[CanvasElement] = []
+        self.hovered: bool = False
         super().__init__()
 
     @property
@@ -88,7 +89,7 @@ class CanvasElement(ABC):
     def initialize(self, window: MlxWindow) -> None:
         if self._initialized:
             return Logger.get().w(
-                "Attempted to initialize an"
+                "Attempted to initialize an "
                 + "already initialized canvas element."
             )
         self.window = window
@@ -254,6 +255,23 @@ class CanvasElement(ABC):
     def is_hovering(self, mouse_pos: Vector2) -> bool:
         return self.rect.has_point(mouse_pos)
 
+    def update_hover(self, mouse_pos: Vector2) -> None:
+        now = self.is_hovering(mouse_pos)
+        if now and not self.hovered:
+            self.hovered = True
+            self._on_hover_enter()
+        elif not now and self.hovered:
+            self.hovered = False
+            self._on_hover_exit()
+        for c in self.children:
+            c.update_hover(mouse_pos)
+
+    def _on_hover_enter(self) -> None:
+        pass
+
+    def _on_hover_exit(self) -> None:
+        pass
+
 
 class Canvas:
     class Anchors(tuple, Enum):
@@ -270,6 +288,7 @@ class Canvas:
         self.main = main
         self.children: list[CanvasElement] = []
         self.delta: float = 0
+        self.mouse_pos: Vector2 = Vector2(-1, -1)
         self.window.hook_mouse_press(self._catch_mouse_press)
         self.window.hook_loop(self.process_loop, None)
         self.window.hook_key_press(self._catch_key_press)
@@ -280,15 +299,15 @@ class Canvas:
             lambda param: self.close_window(param),
             self.window.mptr,
         )
+        self.window.mlx.mlx_hook(
+            self.window.wptr, 6, 64, self._catch_mouse_move, None
+        )
 
     def process_loop(self, _p: None) -> None:
+        for c in self.children:
+            c.update_hover(self.mouse_pos)
         self.clear_canvas()
         self.render_canvas()
-        # now = time.perf_counter()
-        # if (self.main is not None):
-        #     self.main(now - self.delta, self)
-        # self.tick()
-        # self.delta = now
 
     def tick(self) -> None:
         for c in self.children:
@@ -304,6 +323,11 @@ class Canvas:
             Logger.get().e(f"{e}")
             self.close_window(self.window.mptr)
 
+    def _catch_mouse_move(
+            self, x: int, y: int, _p: None
+            ) -> None:
+        self.mouse_pos = Vector2(x, y)
+
     def _catch_key_press(self, key: int, _p: None) -> None:
         for c in self.children:
             c.on_key_press(key)
@@ -312,12 +336,6 @@ class Canvas:
         self.window.mlx.mlx_loop_exit(mptr)
         Logger.get().i("Window got closed successfully!")
         return
-
-    def get_mouse_pos(self) -> Vector2:
-        pos: tuple[int, int, int] = self.window.mlx.mlx_mouse_get_pos(
-            self.window.mptr
-        )
-        return Vector2(pos[1], pos[2])
 
     def add_child(self, element: CanvasElement) -> None:
         element.initialize(self.window)

@@ -7,7 +7,7 @@ from maze_generator import (
     Logger)
 from rendering import (
     CanvasMaze, CanvasMainMenu, MlxWindow, Canvas, Colors,
-    CanvasBoxContainer, MazeOverlay
+    CanvasContainer, PathOverlay, GameOverlay
 )
 
 
@@ -40,6 +40,7 @@ def load_conf(conf_path: str) -> MazeConfig | None:
 
 def main() -> None:
     conf: MazeConfig | None = None
+    conf_path: str | None = None
     try:
         if (len(sys.argv) < 2):
             raise Exception()
@@ -47,7 +48,8 @@ def main() -> None:
             conf = load_conf(sys.argv[1])
             conf_path = sys.argv[1]
     except Exception:
-        Logger.get().e("No config specified.")
+        Logger.get().e("No config specified. Using defaults instead.")
+        conf = MazeConfig()
     if (conf is None):
         Logger.get().e("Failed to load configuration.")
         return
@@ -61,28 +63,23 @@ def main() -> None:
     window: MlxWindow = MlxWindow()
     window.init_window((2560, 1440), Colors.DARK_GRAY, "A-Maze-Ing!")
     canvas: Canvas = Canvas(window)
-    container = CanvasBoxContainer(100, 100)
+    container = CanvasContainer(100, 100)
     canvas.add_child(container)
-    solution: list[tuple[int, int]] | None = generator.get_solution()
-    if (solution is None):
-        Logger.get().e("Failed to solve maze.")
 
-    maze: CanvasMaze = CanvasMaze(grid, conf, window)
-    overlay = MazeOverlay(maze, solution)
-    menu = CanvasMainMenu(conf, conf_path, maze, generator, overlay)
+    maze: CanvasMaze = CanvasMaze(
+        grid, conf, window, generator.logo.pocket_cells()
+        )
+    path_overlay = PathOverlay(maze)
+    game = GameOverlay(maze, canvas)
+    menu = CanvasMainMenu(conf, conf_path, maze, generator, path_overlay, game)
     container.add_child(maze)
     container.add_child(menu)
-    canvas.add_child(overlay)
-    overlay.global_position = maze.rect.start
-    print(maze.rect)
+    canvas.add_child(path_overlay)
+    canvas.add_child(game)
+    path_overlay.global_position = maze.rect.start
+    game.global_position = maze.rect.start
     canvas.render_canvas()
     window.loop()
-
-# SETTINGS READ FROM CONF OBJECT INSTEAD
-# WITH SMALL TRANSLATOR FOR ENTRY AND EXIT POS
-# MazeConfig.__vars__ USE THAT INSTEAD
-# CHANGE THE LOGO FOR ENCLOSED CELLS TO
-# 0 (gaps in 8 and 9 for example)
 
 
 if __name__ == "__main__":

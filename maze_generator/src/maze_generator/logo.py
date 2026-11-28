@@ -51,13 +51,13 @@ CHARS: dict[str, list[str]] = {
     "]": ["###", "..#", "..#", "..#", "###"],
     "'": [".#.", ".#.", "...", "...", "..."],
     "!": [".#.", ".#.", ".#.", "...", ".#."],
-    "~": ["#.#", "###", "###", ".#.", "..."],
     ".": ["...", "...", "...", "...", "#.."],
     "?": ["###", "..#", ".#.", "...", ".#."],
     "{": [".##", ".#.", "##.", ".#.", ".##"],
     "}": ["##.", ".#.", ".##", ".#.", "##."],
     "<": ["..#", ".#.", "#..", ".#.", "..#"],
     ">": ["#..", ".#.", "..#", ".#.", "#.."],
+    "~": ["#.#", "###", "###", ".#.", "..."],
 }
 
 
@@ -67,6 +67,9 @@ class Logos:
         self.width = conf.width
         self.height = conf.height
         self.full_logo: list[list[bool]] = [
+            [False for _ in range(self.width)] for _ in range(self.height)
+        ]
+        self.glyph: list[list[bool]] = [
             [False for _ in range(self.width)] for _ in range(self.height)
         ]
 
@@ -90,6 +93,7 @@ class Logos:
             logo_len += 3
             if i < len(self.logo) - 1 and self.logo[i + 1] != " ":
                 logo_len += 1
+
         if self.height < 7 or self.width < logo_len + 2:
             Logger.get().w(
                 f"Maze too small for logo: must be at least {logo_len + 2}"
@@ -117,6 +121,14 @@ class Logos:
         self.glyph = [row[:] for row in self.full_logo]
         self.fill_pockets()
         return self.full_logo
+
+    def pocket_cells(self) -> set[tuple[int, int]]:
+        return {
+            (r, c)
+            for r in range(self.height)
+            for c in range(self.width)
+            if self.full_logo[r][c] and not self.glyph[r][c]
+        }
 
     def fill_pockets(self) -> None:
         seen = [[False] * self.width for _ in range(self.height)]
